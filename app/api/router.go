@@ -8,10 +8,20 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/shared"
 )
 
-func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App) *http.ServeMux {
+type Middleware func(http.Handler) http.Handler
+
+func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /catalog", rest.NewListByQueryHandle(monitor, catalogApp.GetProducts, encodeProductResponse))
 
-	return mux
+	return chainMiddlewares(mux, rest.OperationIdMiddleware, rest.NewLoggingMiddleware(monitor.Logger()))
+}
+
+// Chain applies middlewares in order, so the first one runs first
+func chainMiddlewares(h http.Handler, middlewares ...Middleware) http.Handler {
+	for i := len(middlewares) - 1; i >= 0; i-- {
+		h = middlewares[i](h)
+	}
+	return h
 }

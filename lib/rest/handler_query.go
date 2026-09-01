@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/mytheresa/go-hiring-challenge/domain/list"
@@ -10,7 +11,7 @@ import (
 
 func NewListByQueryHandle[DO, RO any](
 	monitor shared.Monitor,
-	h shared.HandlerFunc[list.ListResponse[DO], *query.Query],
+	appHandler func(context.Context, *query.Query) (list.ListResponse[DO], error),
 	itemEncoder func(DO) RO,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -20,13 +21,13 @@ func NewListByQueryHandle[DO, RO any](
 			return
 		}
 
-		out, err := h(r.Context(), q)
+		out, err := appHandler(r.Context(), q)
 		if err != nil {
 			HandleHTTPError(monitor.Logger(), w, r, err)
 			return
 		}
 
 		w.Header().Add("Content-Type", "application/json")
-		EncodeListResponse(monitor.Logger(), itemEncoder, out, q, w, r)
+		EncodeListResponse(monitor.Logger(), r.Context(), itemEncoder, out, q, w, r)
 	}
 }

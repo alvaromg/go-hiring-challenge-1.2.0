@@ -40,12 +40,6 @@
               "key": "pageSize",
               "value": "10",
               "disabled": true
-            },
-            {
-              "key": "sort",
-              "value": "aaa",
-              "type": "text",
-              "disabled": true
             }
           ]
         }

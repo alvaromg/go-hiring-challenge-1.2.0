@@ -33,7 +33,7 @@ func DecodeQueryFromRequest(r *http.Request) (*query.Query, error) {
 			return nil, fmt.Errorf("invalid page parameter %q", pageStr)
 		}
 		if page <= 0 {
-			return nil, fmt.Errorf("page paremeter must be greater or equal than 0")
+			return nil, fmt.Errorf("page paremeter must be greater or equal to 0")
 		}
 	}
 
@@ -44,10 +44,10 @@ func DecodeQueryFromRequest(r *http.Request) (*query.Query, error) {
 			return nil, fmt.Errorf("invalid page size parameter %q", pageStr)
 		}
 		if pageSize < 1 {
-			return nil, fmt.Errorf("page size paremeter must be greater or equal than 1")
+			return nil, fmt.Errorf("page size paremeter must be greater or equal to 1")
 		}
 		if pageSize > maxPageSize {
-			return nil, fmt.Errorf("page size paremeter must lower or equal than %d", maxPageSize)
+			return nil, fmt.Errorf("page size paremeter must lower or equal to %d", maxPageSize)
 		}
 	}
 	q = q.AddPagination(page, pageSize)

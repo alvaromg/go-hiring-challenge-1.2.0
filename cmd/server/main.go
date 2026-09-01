@@ -64,16 +64,16 @@ func main() {
 
 	// Start the server
 	go func() {
-		log.Printf("Starting server on http://%s", srv.Addr)
+		logger.Infof("Starting server on http://%s", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed: %s", err)
 		}
 
-		log.Println("Server stopped gracefully")
+		logger.Infof("Server stopped gracefully")
 	}()
 
 	<-ctx.Done()
-	log.Println("Shutting down server...")
+	logger.Infof("Shutting down server...")
 	srv.Shutdown(ctx)
 	stop()
 }

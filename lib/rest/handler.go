@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/mytheresa/go-hiring-challenge/shared"
@@ -30,7 +31,7 @@ import (
 // executed before handler in the same order as they are declared
 func NewHandler[DO, DI, RO any](
 	monitor shared.Monitor,
-	handler shared.HandlerFunc[DO, DI],
+	appHandler func(context.Context, DI) (DO, error),
 	requestDecoder func(*http.Request) (DI, error),
 	dataEncoder func(DO) (RO, error),
 	okStatusCode int,
@@ -42,7 +43,7 @@ func NewHandler[DO, DI, RO any](
 			return
 		}
 
-		out, err := handler(r.Context(), decodedRequest)
+		out, err := appHandler(r.Context(), decodedRequest)
 		if err != nil {
 			HandleHTTPError(monitor.Logger(), w, r, err)
 			return
@@ -50,6 +51,6 @@ func NewHandler[DO, DI, RO any](
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(okStatusCode)
-		encodeHandlerResponse(monitor.Logger(), dataEncoder, out, w, r)
+		encodeHandlerResponse(monitor.Logger(), r.Context(), dataEncoder, out, w, r)
 	}
 }

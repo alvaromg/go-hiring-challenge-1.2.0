@@ -23,7 +23,7 @@ type ResponseMetadata struct {
 type EmptyResponse struct {
 }
 
-func encodeHandlerResponse[DO, RO any](log shared.Logger, encoder func(DO) (RO, error), out DO, w http.ResponseWriter, r *http.Request) {
+func encodeHandlerResponse[DO, RO any](log shared.Logger, ctx context.Context, encoder func(DO) (RO, error), out DO, w http.ResponseWriter, r *http.Request) {
 	encodedData, err := encoder(out)
 	if err != nil {
 		HandleHTTPError(log, w, r, err)
@@ -32,7 +32,7 @@ func encodeHandlerResponse[DO, RO any](log shared.Logger, encoder func(DO) (RO, 
 
 	restOut := Response[RO]{
 		Metadata: ResponseMetadata{
-			// OperationID: shared.OperationIDFromContext(ctx),
+			OperationID: operationIdFromContext(ctx),
 		},
 		Data: encodedData,
 	}

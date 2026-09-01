@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
 	"math"
 	"net/http"
@@ -16,7 +17,7 @@ type ListResponse[T any] struct {
 }
 
 type ListResponseMetadata struct {
-	OperationID string `json:"operationId"`
+	OperationId string `json:"operationId"`
 	TotalCount  uint   `json:"totalCount"`
 	Page        int    `json:"page"`
 	PageSize    int    `json:"pageSize"`
@@ -25,6 +26,7 @@ type ListResponseMetadata struct {
 
 func EncodeListResponse[DO, RO any](
 	log shared.Logger,
+	ctx context.Context,
 	itemEncoder func(DO) RO,
 	out list.ListResponse[DO],
 	query *query.Query,
@@ -35,11 +37,11 @@ func EncodeListResponse[DO, RO any](
 
 	restOut := ListResponse[RO]{
 		Metadata: ListResponseMetadata{
-			// OperationID: shared.OperationIDFromContext(ctx),
-			TotalCount: out.Total(),
-			Page:       query.Pagination().Page(),
-			PageSize:   query.Pagination().PageSize(),
-			PageCount:  int(pageCount),
+			OperationId: operationIdFromContext(ctx),
+			TotalCount:  out.Total(),
+			Page:        query.Pagination().Page(),
+			PageSize:    query.Pagination().PageSize(),
+			PageCount:   int(pageCount),
 		},
 		Data: []RO{},
 	}
