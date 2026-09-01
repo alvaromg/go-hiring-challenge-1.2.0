@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
 	"github.com/shopspring/decimal"
 )
 
@@ -17,4 +18,22 @@ type Variant struct {
 
 func (v *Variant) TableName() string {
 	return "product_variants"
+}
+
+func variantToDomain(dbVariant Variant) catalog.Variant {
+	return catalog.Variant{
+		ID:        dbVariant.ID,
+		ProductID: dbVariant.ProductID,
+		Name:      dbVariant.Name,
+		SKU:       dbVariant.SKU,
+		Price:     dbVariant.Price,
+	}
+}
+
+func variantsToDomain(dbVariants []Variant) []catalog.Variant {
+	variants := make([]catalog.Variant, len(dbVariants))
+	for i, dbVariant := range dbVariants {
+		variants[i] = variantToDomain(dbVariant)
+	}
+	return variants
 }
