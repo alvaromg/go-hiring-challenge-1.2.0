@@ -1,0 +1,6 @@
+{
+    "go.testEnvVars": {},
+    "go.lintTool": "golangci-lint",
+    "go.lintFlags": ["--config", ".golangci.yml"],
+    "go.lintOnSave": "workspace"
+}

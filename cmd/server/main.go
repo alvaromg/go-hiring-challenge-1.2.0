@@ -10,12 +10,24 @@ import (
 	"syscall"
 
 	"github.com/joho/godotenv"
+	"github.com/mytheresa/go-hiring-challenge/app/api"
 	"github.com/mytheresa/go-hiring-challenge/app/catalog"
 	"github.com/mytheresa/go-hiring-challenge/app/database"
+	"github.com/mytheresa/go-hiring-challenge/lib/monitor"
 	"github.com/mytheresa/go-hiring-challenge/models"
 )
 
 func main() {
+
+	// create monitor
+
+	logger, err := monitor.NewLogger("INFO", false)
+	if err != nil {
+		log.Fatalf("Error creating logger: %s", err)
+	}
+
+	monitor := monitor.NewMonitor(logger)
+
 	// Load environment variables from .env file
 	if err := godotenv.Load(".env"); err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
@@ -34,18 +46,19 @@ func main() {
 	)
 	defer close()
 
-	// Initialize handlers
+	// Initialize repositories
 	prodRepo := models.NewProductsRepository(db)
-	cat := catalog.NewCatalogHandler(prodRepo)
+
+	// Initialize applications
+	catalogApp := catalog.NewCatalogApp(prodRepo)
 
 	// Set up routing
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /catalog", cat.HandleGet)
+	router := api.NewApiRouter(monitor, catalogApp)
 
 	// Set up the HTTP server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("localhost:%s", os.Getenv("HTTP_PORT")),
-		Handler: mux,
+		Handler: router,
 	}
 
 	// Start the server

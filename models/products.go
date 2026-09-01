@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
 	"github.com/shopspring/decimal"
 )
 
@@ -15,4 +16,20 @@ type Product struct {
 
 func (p *Product) TableName() string {
 	return "products"
+}
+
+func productToDomain(dbProduct Product) *catalog.Product {
+	product := &catalog.Product{
+		Code:  dbProduct.Code,
+		Price: dbProduct.Price,
+	}
+	return product
+}
+
+func productsToDomain(dbProducts []Product) []*catalog.Product {
+	products := make([]*catalog.Product, len(dbProducts))
+	for i, dbProduct := range dbProducts {
+		products[i] = productToDomain(dbProduct)
+	}
+	return products
 }
