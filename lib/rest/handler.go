@@ -36,16 +36,15 @@ func NewHandler[DO, DI, RO any](
 	okStatusCode int,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		decodedRequest, err := requestDecoder(r)
 		if err != nil {
-			// HandleHTTPError(monitor.Logger(), w, r, liberr.Wrap(err, ErrTypeBadRequest))
+			HandleHTTPError(monitor.Logger(), w, r, err)
 			return
 		}
 
 		out, err := handler(r.Context(), decodedRequest)
 		if err != nil {
-			// HandleHTTPError(monitor.Logger(), w, r, err)
+			HandleHTTPError(monitor.Logger(), w, r, err)
 			return
 		}
 

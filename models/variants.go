@@ -5,10 +5,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Variant represents a product variant in the catalog.
+// variant represents a product variant in the catalog.
 // It includes a unique name, SKU, and an optional price.
 // Variants can be used to represent different configurations or options for a product.
-type Variant struct {
+type variant struct {
 	ID        uint            `gorm:"primaryKey"`
 	ProductID uint            `gorm:"not null"`
 	Name      string          `gorm:"not null"`
@@ -16,11 +16,11 @@ type Variant struct {
 	Price     decimal.Decimal `gorm:"type:decimal(10,2);null"`
 }
 
-func (v *Variant) TableName() string {
+func (v *variant) TableName() string {
 	return "product_variants"
 }
 
-func variantToDomain(dbVariant Variant) catalog.Variant {
+func variantToDomain(dbVariant variant) catalog.Variant {
 	return catalog.Variant{
 		ID:        dbVariant.ID,
 		ProductID: dbVariant.ProductID,
@@ -30,7 +30,7 @@ func variantToDomain(dbVariant Variant) catalog.Variant {
 	}
 }
 
-func variantsToDomain(dbVariants []Variant) []catalog.Variant {
+func variantsToDomain(dbVariants []variant) []catalog.Variant {
 	variants := make([]catalog.Variant, len(dbVariants))
 	for i, dbVariant := range dbVariants {
 		variants[i] = variantToDomain(dbVariant)

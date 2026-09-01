@@ -1,8 +1,6 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
 	"github.com/shopspring/decimal"
 )
@@ -18,14 +16,6 @@ type product struct {
 	Price      decimal.Decimal `json:"price"`
 	Categories []category      `json:"categories"`
 	Variants   []variant       `json:"variants"`
-}
-
-type productsList struct {
-	Products []product `json:"products"`
-}
-
-func decodeGetProductsListRequest(r *http.Request) (struct{}, error) {
-	return struct{}{}, nil
 }
 
 func encodeVariantResponse(v catalog.Variant) variant {
@@ -53,16 +43,4 @@ func encodeProductResponse(p *catalog.Product) product {
 		Categories: categories,
 		Variants:   variants,
 	}
-}
-
-func encodeProductsListResponse(products []*catalog.Product) (productsList, error) {
-	productsList := productsList{
-		Products: make([]product, len(products)),
-	}
-
-	for i, p := range products {
-		productsList.Products[i] = encodeProductResponse(p)
-	}
-
-	return productsList, nil
 }

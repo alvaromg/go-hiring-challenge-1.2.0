@@ -18,6 +18,35 @@
           ],
           "path": [
             "catalog"
+          ],
+          "query": [
+            {
+              "key": "filter_price_lt",
+              "value": "12",
+              "disabled": true
+            },
+            {
+              "key": "filter_category_eq",
+              "value": "CAT001",
+              "disabled": true
+            },
+            {
+              "key": "page",
+              "value": "1",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "pageSize",
+              "value": "10",
+              "disabled": true
+            },
+            {
+              "key": "sort",
+              "value": "aaa",
+              "type": "text",
+              "disabled": true
+            }
           ]
         }
       },

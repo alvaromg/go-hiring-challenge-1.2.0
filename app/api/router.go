@@ -11,7 +11,7 @@ import (
 func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /catalog", rest.NewHandler(monitor, catalogApp.GetProducts, decodeGetProductsListRequest, encodeProductsListResponse, http.StatusOK))
+	mux.HandleFunc("GET /catalog", rest.NewListByQueryHandle(monitor, catalogApp.GetProducts, encodeProductResponse))
 
 	return mux
 }
