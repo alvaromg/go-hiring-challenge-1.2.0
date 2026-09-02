@@ -8,6 +8,7 @@ import (
 
 	"github.com/mytheresa/go-hiring-challenge/domain/list"
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
+	"github.com/mytheresa/go-hiring-challenge/lib/operation"
 	"github.com/mytheresa/go-hiring-challenge/shared"
 )
 
@@ -37,7 +38,7 @@ func EncodeListResponse[DO, RO any](
 
 	restOut := ListResponse[RO]{
 		Metadata: ListResponseMetadata{
-			OperationId: operationIdFromContext(ctx),
+			OperationId: operation.IdFromContext(ctx),
 			TotalCount:  out.Total(),
 			Page:        query.Pagination().Page(),
 			PageSize:    query.Pagination().PageSize(),

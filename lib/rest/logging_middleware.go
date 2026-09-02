@@ -27,7 +27,7 @@ func NewLoggingMiddleware(logger shared.Logger) func(http.Handler) http.Handler 
 
 			next.ServeHTTP(rec, r)
 
-			logger.Infof("%s %s %d %s", r.Method, r.URL.RequestURI(), rec.statusCode, time.Since(start))
+			logger.WithContext(r.Context()).Infof("%s %s %d %s", r.Method, r.URL.RequestURI(), rec.statusCode, time.Since(start))
 		})
 	}
 }

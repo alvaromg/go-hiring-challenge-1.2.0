@@ -4,23 +4,21 @@ import (
 	"context"
 	"log"
 
+	"github.com/mytheresa/go-hiring-challenge/lib/operation"
 	"github.com/sirupsen/logrus"
 )
+
+const operationIdKey = "operationId"
 
 type logger struct {
 	inner *logrus.Logger
 }
 
 // NewLogger creates a new logger with the specified level and formatting options.
-// Use LoggerOption functions to configure additional features like OpenTelemetry integration.
-//
-// Example:
-//
-//	logger, err := logger.NewLogger("info", false, logger.WithOtelLogger(otelLogger))
 func NewLogger(level string, pretty bool) (*logger, error) {
 	logLevel, err := logrus.ParseLevel(level)
 	if err != nil {
-		log.Fatalf("Error loading .env file: %s", err)
+		log.Fatalf("error parsing log level: %s", err)
 	}
 
 	l := &logger{
@@ -28,43 +26,48 @@ func NewLogger(level string, pretty bool) (*logger, error) {
 	}
 
 	l.inner.SetLevel(logLevel)
-	// l.inner.AddHook(newLogrusTraceHook(cfg.otelLogger))
 	l.inner.SetFormatter(NewLogFormatter(pretty))
 
 	return l, nil
 }
 
-func (l *logger) Printf(format string, args ...interface{}) {
+func (l *logger) Printf(format string, args ...any) {
 	l.inner.Logf(logrus.InfoLevel, format, args...)
 }
 
-func (l *logger) Infof(format string, args ...interface{}) {
+func (l *logger) Infof(format string, args ...any) {
 	l.inner.Logf(logrus.InfoLevel, format, args...)
 }
 
-func (l *logger) Debugf(format string, args ...interface{}) {
+func (l *logger) Debugf(format string, args ...any) {
 	l.inner.Logf(logrus.DebugLevel, format, args...)
 }
 
-func (l *logger) Tracef(format string, args ...interface{}) {
+func (l *logger) Tracef(format string, args ...any) {
 	l.inner.Logf(logrus.TraceLevel, format, args...)
 }
 
-func (l *logger) Warnf(format string, args ...interface{}) {
+func (l *logger) Warnf(format string, args ...any) {
 	l.inner.Logf(logrus.WarnLevel, format, args...)
 }
 
-func (l *logger) Errorf(format string, args ...interface{}) {
+func (l *logger) Errorf(format string, args ...any) {
 	l.inner.Logf(logrus.ErrorLevel, format, args...)
 }
 
-func (l *logger) WithFields(fields map[string]interface{}) *logrus.Entry {
+func (l *logger) WithFields(fields map[string]any) *logrus.Entry {
 	entry := l.inner.WithFields(fields)
 	return entry
 }
 
 func (l *logger) WithContext(ctx context.Context) *logrus.Entry {
 	entry := l.inner.WithContext(ctx)
+
+	operationId := operation.IdFromContext(ctx)
+	if operationId != "" {
+		entry = entry.WithField(operationIdKey, operationId)
+	}
+
 	return entry
 }
 

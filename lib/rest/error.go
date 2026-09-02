@@ -9,16 +9,23 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/shared"
 
 	domainerrors "github.com/mytheresa/go-hiring-challenge/domain/errors"
+	"github.com/mytheresa/go-hiring-challenge/domain/query"
+
+	libmodel "github.com/mytheresa/go-hiring-challenge/lib/model"
+	"github.com/mytheresa/go-hiring-challenge/lib/operation"
+)
+
+var (
+	ErrorBadRequest = errors.New("bad request error")
 )
 
 func HandleHTTPError(log shared.Logger, w http.ResponseWriter, r *http.Request, err error) {
-	// log.WithContext(r.Context()).
-	// 	WithFields(
-	// 		logFieldsFromContext(r.Context()),
-	// 	).
-	// 	WithField("stack", liberr.GetErrStack(err)).
-	// 	WithField("errorType", liberr.GetErrorType(err)).
-	// 	Error(err.Error())
+
+	log.WithContext(r.Context()).Errorf("%s", err.Error())
+	if errors.Is(err, libmodel.ErrorPersistence) {
+		// if it's a persistence error don't include details in http response
+		err = libmodel.ErrorPersistence
+	}
 
 	w.Header().Add("Content-Type", "application/json")
 
@@ -35,24 +42,12 @@ func HandleHTTPError(log shared.Logger, w http.ResponseWriter, r *http.Request, 
 }
 
 func errToHTTPCode(err error) int {
+	if errors.Is(err, ErrorBadRequest) || errors.Is(err, query.ErrorInvalidQuery) {
+		return http.StatusBadRequest
+	}
 	if errors.Is(err, domainerrors.ErrorNotFound) {
 		return http.StatusNotFound
 	}
-	// if errors.Is(err, liberr.NewType(shared.ErrTypeAuthorization)) {
-	// 	return http.StatusForbidden
-	// }
-	// if errors.Is(err, liberr.NewType(ErrTypeBadRequest)) ||
-	// 	errors.Is(err, liberr.NewType(shared.ErrTypeInvalidApplicationInput)) ||
-	// 	errors.Is(err, liberr.NewType(query.ErrTypeInvalidQuery)) {
-	// 	return http.StatusBadRequest
-	// }
-	// if errors.Is(err, liberr.NewType(shared.ErrTypeNotFound)) {
-	// 	return http.StatusNotFound
-	// }
-	// if errors.Is(err, liberr.NewType(shared.ErrTypeConflict)) ||
-	// 	errors.Is(err, liberr.NewType(shared.ErrTypeDomainValidation)) {
-	// 	return http.StatusConflict
-	// }
 	return http.StatusInternalServerError
 }
 
@@ -66,16 +61,9 @@ type Error struct {
 }
 
 func encodeErrorResponse(ctx context.Context, err error) ErrorResponse {
-	// errStr := ""
-	// if errors.Is(err, liberr.NewType(shared.ErrTypeAuthentication)) {
-	// 	errStr = shared.T(ctx, i18n.ErrorLibRestNotauthenticated)
-	// } else {
-	// 	errStr = err.Error()
-	// }
-
 	return ErrorResponse{
 		Metadata: ResponseMetadata{
-			OperationId: operationIdFromContext(ctx),
+			OperationId: operation.IdFromContext(ctx),
 		},
 		Error: Error{
 			Message: err.Error(),

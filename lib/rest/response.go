@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/mytheresa/go-hiring-challenge/shared"
+
+	"github.com/mytheresa/go-hiring-challenge/lib/operation"
 )
 
 type JsonString json.RawMessage
@@ -32,7 +34,7 @@ func encodeHandlerResponse[DO, RO any](log shared.Logger, ctx context.Context, e
 
 	restOut := Response[RO]{
 		Metadata: ResponseMetadata{
-			OperationId: operationIdFromContext(ctx),
+			OperationId: operation.IdFromContext(ctx),
 		},
 		Data: encodedData,
 	}

@@ -30,10 +30,10 @@ func DecodeQueryFromRequest(r *http.Request) (*query.Query, error) {
 	if pageStr != "" {
 		page, err = strconv.Atoi(pageStr)
 		if err != nil {
-			return nil, fmt.Errorf("invalid page parameter %q", pageStr)
+			return nil, fmt.Errorf("%w: invalid page parameter %q", ErrorBadRequest, pageStr)
 		}
 		if page <= 0 {
-			return nil, fmt.Errorf("page paremeter must be greater or equal to 0")
+			return nil, fmt.Errorf("%w: page paremeter must be greater or equal to 0", ErrorBadRequest)
 		}
 	}
 
@@ -41,13 +41,13 @@ func DecodeQueryFromRequest(r *http.Request) (*query.Query, error) {
 	if params.Get(pageSizeParam) != "" {
 		pageSize, err = strconv.Atoi(params.Get(pageSizeParam))
 		if err != nil {
-			return nil, fmt.Errorf("invalid page size parameter %q", pageStr)
+			return nil, fmt.Errorf("%w: invalid page size parameter %q", ErrorBadRequest, pageStr)
 		}
 		if pageSize < 1 {
-			return nil, fmt.Errorf("page size paremeter must be greater or equal to 1")
+			return nil, fmt.Errorf("%w: page size paremeter must be greater or equal to 1", ErrorBadRequest)
 		}
 		if pageSize > maxPageSize {
-			return nil, fmt.Errorf("page size paremeter must lower or equal to %d", maxPageSize)
+			return nil, fmt.Errorf("%w: page size paremeter must lower or equal to %d", ErrorBadRequest, maxPageSize)
 		}
 	}
 	q = q.AddPagination(page, pageSize)
@@ -67,7 +67,7 @@ func DecodeQueryFromRequest(r *http.Request) (*query.Query, error) {
 
 	filters, err := parseFilters(r.URL.Query())
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse page filters: %s", err)
+		return nil, fmt.Errorf("%w: %s", ErrorBadRequest, err)
 	}
 	q = q.AddFilters(filters...)
 
@@ -100,21 +100,13 @@ func parseFilters(values url.Values) ([]query.Filter, error) {
 
 		op, err := query.ParseOperator(operator)
 		if err != nil {
-			return nil, fmt.Errorf("unable to parse query operator %q", operator)
+			return nil, err
 		}
 
 		// Parse filter values based on operator type (preserve original operator)
 		var filterValue any
 
 		switch op {
-		case query.In, query.Nin:
-			// Parse comma-separated values into a slice
-			values := strings.Split(val[0], ",")
-			// Trim whitespace from each value
-			for i := range values {
-				values[i] = strings.TrimSpace(values[i])
-			}
-			filterValue = values
 		case query.Eq, query.Ne:
 			// For Eq/Ne operators, use single string value
 			filterValue = strings.TrimSpace(val[0])

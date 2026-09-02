@@ -59,24 +59,6 @@ func ApplyQueryFilters(db *gorm.DB, q *query.Query, fieldsMapping map[string]str
 			db = db.Where(fmt.Sprintf("%s < ?", field), filter.Value())
 		case query.Lte:
 			db = db.Where(fmt.Sprintf("%s <= ?", field), filter.Value())
-		case query.In:
-			db = db.Where(fmt.Sprintf("%s IN (?)", field), filter.Value())
-		case query.Nin:
-			db = db.Where(fmt.Sprintf("%s NOT IN (?)", field), filter.Value())
-		case query.Like:
-			db = db.Where(fmt.Sprintf("%s ILIKE ?", field), fmt.Sprintf("%%%s%%", filter.Value()))
-		case query.Is:
-			if filter.Value() == nil {
-				db = db.Where(fmt.Sprintf("%s IS NULL", field))
-			} else {
-				db = db.Where(fmt.Sprintf("%s IS ?", field), filter.Value())
-			}
-		case query.IsNot:
-			if filter.Value() == nil {
-				db = db.Where(fmt.Sprintf("%s IS NOT NULL", field))
-			} else {
-				db = db.Where(fmt.Sprintf("%s IS NOT ?", field), filter.Value())
-			}
 		}
 	}
 

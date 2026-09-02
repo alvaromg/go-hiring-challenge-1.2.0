@@ -1,5 +1,11 @@
 package shared
 
+import (
+	"context"
+
+	"github.com/sirupsen/logrus"
+)
+
 type Monitor interface {
 	Logger() Logger
 	// Tracer() libmonitor.Tracer
@@ -13,6 +19,6 @@ type Logger interface {
 	Debugf(format string, args ...any)
 	Tracef(format string, args ...any)
 	Warnf(format string, args ...any)
-	// WithFields(map[string]interface{}) *logrus.Entry
-	// WithContext(ctx context.Context) *logrus.Entry
+	WithFields(map[string]any) *logrus.Entry
+	WithContext(ctx context.Context) *logrus.Entry
 }

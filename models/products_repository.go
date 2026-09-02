@@ -37,19 +37,19 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 		AllowFilter(FieldCategory, []query.Operator{query.Eq}, query.ValidateString).
 		AllowFilter(FieldPrice, []query.Operator{query.Lt}, query.ValidateString)
 	if err := validator.Validate(q); err != nil {
-		return listRes, fmt.Errorf("invalid query: %s", err)
+		return listRes, err
 	}
 
 	// ensure the category filter, if present, refers to an existing category
 	if q.HasFilter(FieldCategory) {
 		categoryCode, ok := q.GetFilter(FieldCategory).Value().(string)
 		if !ok {
-			return listRes, fmt.Errorf("error parsing category field")
+			return listRes, fmt.Errorf("%w: error parsing category field", libmodel.ErrorPersistence)
 		}
 
 		var count int64
 		if err := r.db.Model(&category{}).Where("code = ?", categoryCode).Count(&count).Error; err != nil {
-			return listRes, fmt.Errorf("error checking category: %s", err)
+			return listRes, fmt.Errorf("%w: error checking category existence: %s", libmodel.ErrorPersistence, err)
 		}
 		if count == 0 {
 			return listRes, fmt.Errorf("%w: category %q not found", domainerrors.ErrorNotFound, categoryCode)
@@ -69,7 +69,7 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 	var total int64
 	err := db.Model(&product{}).Count(&total).Error
 	if err != nil {
-		return listRes, fmt.Errorf("error counting products: %s", err)
+		return listRes, fmt.Errorf("%w: error counting products: %s", libmodel.ErrorPersistence, err)
 	}
 	if total == 0 {
 		return listRes, nil
@@ -82,13 +82,13 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 	// get products ids for requested page (filters + sort + pagination)
 	var ids []uint
 	if err = db.Model(&product{}).Find(&ids).Error; err != nil {
-		return listRes, fmt.Errorf("error counting products: %s", err)
+		return listRes, fmt.Errorf("%w: error finding products: %s", libmodel.ErrorPersistence, err)
 	}
 
 	// get full products for requested page, based on previous filtered, sortd and paginated ids
 	var products []product
 	if err := r.db.Preload("Variants").Preload("Category").Where("products.id IN ?", ids).Find(&products).Error; err != nil {
-		return listRes, err
+		return listRes, fmt.Errorf("%w: error retrieving products: %s", libmodel.ErrorPersistence, err)
 	}
 
 	// build page response with domain products

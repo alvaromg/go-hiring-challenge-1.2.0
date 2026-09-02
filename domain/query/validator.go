@@ -3,11 +3,12 @@ package query
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"slices"
 	"strconv"
 	"time"
 )
+
+var ErrorInvalidQuery = errors.New("invalid query")
 
 // filterValidation defines validation rules for a specific filter field
 type filterValidation struct {
@@ -41,7 +42,7 @@ type validator struct {
 // )
 
 func newErrInvalidQuery(format string, args ...any) error {
-	return fmt.Errorf(format, args...)
+	return fmt.Errorf("%w: %s", ErrorInvalidQuery, fmt.Sprintf(format, args...))
 }
 
 // NewValidator creates a new QueryValidator
@@ -185,35 +186,6 @@ func ValidateString(value any) error {
 	return nil
 }
 
-func ValidateSlice[T any](value any) error {
-	slice, ok := value.([]T)
-	if !ok {
-		return newErrInvalidQuery("value must be a slice")
-	}
-	if len(slice) == 0 {
-		return newErrInvalidQuery("slice cannot be empty")
-	}
-
-	return nil
-}
-
-// ValidateStringOrSlice validates that the value is either a string or a slice of strings
-// This is useful for fields that support both Eq/Ne (single string) and In/Nin (string slice) operators
-func ValidateStringOrSlice(value any) error {
-	// Check if it's a string (for Eq/Ne operators)
-	if _, ok := value.(string); ok {
-		return nil
-	}
-	// Check if it's a slice of strings (for In/Nin operators)
-	if slice, ok := value.([]string); ok {
-		if len(slice) == 0 {
-			return errors.New("slice cannot be empty")
-		}
-		return nil
-	}
-	return errors.New("value must be a string or slice of strings")
-}
-
 func ValidateDate(value any) error {
 	dateStr, ok := value.(string)
 	if !ok {
@@ -275,34 +247,6 @@ func ValidateNumeric(value any) error {
 	}
 }
 
-// ValidateAllowedValues validates that the value is in the list of allowed values
-func ValidateAllowedValues(allowedValues []any) func(value any) error {
-	return func(value any) error {
-		for _, allowed := range allowedValues {
-			if reflect.DeepEqual(value, allowed) {
-				return nil
-			}
-		}
-		return fmt.Errorf("value must be one of %v", allowedValues)
-	}
-}
-
-// AllOperatorsExcept returns all operators except the specified ones
-func AllOperatorsExcept(excluded ...Operator) []Operator {
-
-	allOps := AllOperators()
-	result := make([]Operator, 0, len(allOps))
-
-	for _, op := range allOps {
-		if !slices.Contains(excluded, op) {
-			result = append(result, op)
-		}
-	}
-
-	return result
-
-}
-
 // NumericOperators returns operators suitable for numeric values
 func NumericOperators() []Operator {
 	return []Operator{Eq, Ne, Gt, Gte, Lt, Lte}
@@ -310,22 +254,11 @@ func NumericOperators() []Operator {
 
 // StringOperators returns operators suitable for string values
 func StringOperators() []Operator {
-	return []Operator{Eq, Ne, Like}
+	return []Operator{Eq, Ne}
 }
 
 // EqualityOperators returns operators for equality comparisons
-func EqualityOperators() []Operator {
-	return []Operator{Eq, Ne, In, Nin}
-}
-
-// SliceOperators returns operators suitable for slice/array values
-func SliceOperators() []Operator {
-	return []Operator{In, Nin}
-}
 
 func JustEqualOperator() []Operator {
 	return []Operator{Eq}
-}
-func JustInOperator() []Operator {
-	return []Operator{In}
 }
