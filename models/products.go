@@ -12,7 +12,8 @@ type product struct {
 	Code       string          `gorm:"uniqueIndex;not null"`
 	Price      decimal.Decimal `gorm:"type:decimal(10,2);not null"`
 	Variants   []variant       `gorm:"foreignKey:ProductID"`
-	Categories []category      `gorm:"many2many:product_categories;"`
+	CategoryID *uint
+	Category   *category
 }
 
 func (p *product) TableName() string {
@@ -21,10 +22,10 @@ func (p *product) TableName() string {
 
 func productToDomain(dbProduct product) *catalog.Product {
 	product := &catalog.Product{
-		Code:       dbProduct.Code,
-		Price:      dbProduct.Price,
-		Variants:   variantsToDomain(dbProduct.Variants),
-		Categories: categoriesToDomain(dbProduct.Categories),
+		Code:     dbProduct.Code,
+		Price:    dbProduct.Price,
+		Variants: variantsToDomain(dbProduct.Variants),
+		Category: categoryToDomainPtr(dbProduct.Category),
 	}
 	return product
 }

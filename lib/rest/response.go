@@ -16,7 +16,7 @@ type Response[T any] struct {
 }
 
 type ResponseMetadata struct {
-	OperationID string            `json:"operationId"`
+	OperationId string            `json:"operationId"`
 	Websocket   map[string]string `json:"websocket,omitempty"`
 }
 
@@ -32,7 +32,7 @@ func encodeHandlerResponse[DO, RO any](log shared.Logger, ctx context.Context, e
 
 	restOut := Response[RO]{
 		Metadata: ResponseMetadata{
-			OperationID: operationIdFromContext(ctx),
+			OperationId: operationIdFromContext(ctx),
 		},
 		Data: encodedData,
 	}

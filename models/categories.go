@@ -22,10 +22,10 @@ func categoryToDomain(dbCategory category) catalog.Category {
 	}
 }
 
-func categoriesToDomain(dbCategories []category) []catalog.Category {
-	categories := make([]catalog.Category, len(dbCategories))
-	for i, dbCategory := range dbCategories {
-		categories[i] = categoryToDomain(dbCategory)
+func categoryToDomainPtr(dbCategory *category) *catalog.Category {
+	if dbCategory == nil {
+		return nil
 	}
-	return categories
+	c := categoryToDomain(*dbCategory)
+	return &c
 }

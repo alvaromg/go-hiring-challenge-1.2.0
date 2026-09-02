@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
+	domainerrors "github.com/mytheresa/go-hiring-challenge/domain/errors"
 	"github.com/mytheresa/go-hiring-challenge/domain/list"
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
 	libmodel "github.com/mytheresa/go-hiring-challenge/lib/model"
@@ -39,13 +40,26 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 		return listRes, fmt.Errorf("invalid query: %s", err)
 	}
 
+	// ensure the category filter, if present, refers to an existing category
+	if q.HasFilter(FieldCategory) {
+		categoryCode, ok := q.GetFilter(FieldCategory).Value().(string)
+		if !ok {
+			return listRes, fmt.Errorf("error parsing category field")
+		}
+
+		var count int64
+		if err := r.db.Model(&category{}).Where("code = ?", categoryCode).Count(&count).Error; err != nil {
+			return listRes, fmt.Errorf("error checking category: %s", err)
+		}
+		if count == 0 {
+			return listRes, fmt.Errorf("%w: category %q not found", domainerrors.ErrorNotFound, categoryCode)
+		}
+	}
+
 	// build query to return just ids
 	db := r.db.Distinct("products.id")
 	if q.HasFilter(FieldCategory) {
-		db = db.
-			Joins("JOIN product_categories pc ON pc.product_id = products.id").
-			Joins("JOIN categories c ON c.id = pc.category_id")
-
+		db = db.Joins("JOIN categories c ON c.id = products.category_id")
 	}
 
 	// apply only filters for counting
@@ -73,7 +87,7 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 
 	// get full products for requested page, based on previous filtered, sortd and paginated ids
 	var products []product
-	if err := r.db.Preload("Variants").Preload("Categories").Where("products.id IN ?", ids).Find(&products).Error; err != nil {
+	if err := r.db.Preload("Variants").Preload("Category").Where("products.id IN ?", ids).Find(&products).Error; err != nil {
 		return listRes, err
 	}
 

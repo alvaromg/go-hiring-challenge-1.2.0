@@ -1,10 +1,14 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/mytheresa/go-hiring-challenge/shared"
+
+	domainerrors "github.com/mytheresa/go-hiring-challenge/domain/errors"
 )
 
 func HandleHTTPError(log shared.Logger, w http.ResponseWriter, r *http.Request, err error) {
@@ -20,7 +24,7 @@ func HandleHTTPError(log shared.Logger, w http.ResponseWriter, r *http.Request, 
 
 	httpErrCode := errToHTTPCode(err)
 	w.WriteHeader(httpErrCode)
-	e := encodeErrorResponse(err)
+	e := encodeErrorResponse(r.Context(), err)
 	jsonOutput, err := json.Marshal(e)
 	if err != nil {
 		panic(err)
@@ -31,9 +35,9 @@ func HandleHTTPError(log shared.Logger, w http.ResponseWriter, r *http.Request, 
 }
 
 func errToHTTPCode(err error) int {
-	// if errors.Is(err, liberr.NewType(shared.ErrTypeAuthentication)) {
-	// 	return http.StatusUnauthorized
-	// }
+	if errors.Is(err, domainerrors.ErrorNotFound) {
+		return http.StatusNotFound
+	}
 	// if errors.Is(err, liberr.NewType(shared.ErrTypeAuthorization)) {
 	// 	return http.StatusForbidden
 	// }
@@ -61,7 +65,7 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-func encodeErrorResponse(err error) ErrorResponse {
+func encodeErrorResponse(ctx context.Context, err error) ErrorResponse {
 	// errStr := ""
 	// if errors.Is(err, liberr.NewType(shared.ErrTypeAuthentication)) {
 	// 	errStr = shared.T(ctx, i18n.ErrorLibRestNotauthenticated)
@@ -71,7 +75,7 @@ func encodeErrorResponse(err error) ErrorResponse {
 
 	return ErrorResponse{
 		Metadata: ResponseMetadata{
-			// OperationId: shared.OperationIdFromContext(ctx),
+			OperationId: operationIdFromContext(ctx),
 		},
 		Error: Error{
 			Message: err.Error(),

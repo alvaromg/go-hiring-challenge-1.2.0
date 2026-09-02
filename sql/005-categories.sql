@@ -10,11 +10,8 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE UNIQUE INDEX IF NOT EXISTS categories_code_idx ON categories (code);
 
--- Categories/products relationship as many to many (more flexible)
+-- Categories/products relationship as many to one (a product belongs to at most one category)
 
-CREATE TABLE IF NOT EXISTS product_categories (
-    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-    category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    PRIMARY KEY (product_id, category_id)
-);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS products_category_id_idx ON products (category_id);
