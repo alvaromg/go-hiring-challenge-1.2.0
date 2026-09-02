@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
+	"github.com/mytheresa/go-hiring-challenge/domain/price"
 	"github.com/shopspring/decimal"
 )
 
@@ -21,12 +22,18 @@ func (v *variant) TableName() string {
 }
 
 func variantToDomain(dbVariant variant) catalog.Variant {
+	var variantPrice *price.Price
+	if dbVariant.Price != nil {
+		p := price.New(*dbVariant.Price)
+		variantPrice = &p
+	}
+
 	return catalog.Variant{
 		ID:        dbVariant.ID,
 		ProductID: dbVariant.ProductID,
 		Name:      dbVariant.Name,
 		SKU:       dbVariant.SKU,
-		Price:     dbVariant.Price,
+		Price:     variantPrice,
 	}
 }
 

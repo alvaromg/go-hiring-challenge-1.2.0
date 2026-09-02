@@ -5,21 +5,21 @@ import (
 	"net/http"
 
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
+	"github.com/mytheresa/go-hiring-challenge/domain/price"
 	"github.com/mytheresa/go-hiring-challenge/infra/rest"
-	"github.com/shopspring/decimal"
 )
 
 type variant struct {
-	Name  string           `json:"name"`
-	SKU   string           `json:"sku"`
-	Price *decimal.Decimal `json:"price"`
+	Name  string       `json:"name"`
+	SKU   string       `json:"sku"`
+	Price *price.Price `json:"price"`
 }
 
 type product struct {
-	Code     string          `json:"code"`
-	Price    decimal.Decimal `json:"price"`
-	Category *category       `json:"category"`
-	Variants []variant       `json:"variants"`
+	Code     string      `json:"code"`
+	Price    price.Price `json:"price"`
+	Category *category   `json:"category"`
+	Variants []variant   `json:"variants"`
 }
 
 func encodeVariantResponse(v catalog.Variant) variant {

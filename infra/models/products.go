@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
+	"github.com/mytheresa/go-hiring-challenge/domain/price"
 	"github.com/shopspring/decimal"
 )
 
@@ -31,7 +32,7 @@ func productToDomain(dbProduct product) (*catalog.Product, error) {
 		return nil, err
 	}
 
-	return catalog.RestoreProduct(id, dbProduct.Price,
+	return catalog.RestoreProduct(id, price.New(dbProduct.Price),
 		catalog.ProductWithCategory(cat),
 		catalog.ProductWithVariants(variantsToDomain(dbProduct.Variants)...),
 	), nil

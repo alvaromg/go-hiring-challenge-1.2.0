@@ -1,11 +1,11 @@
 package catalog
 
-import "github.com/shopspring/decimal"
+import "github.com/mytheresa/go-hiring-challenge/domain/price"
 
 type Variant struct {
 	ID        uint
 	ProductID uint
 	Name      string
 	SKU       string
-	Price     *decimal.Decimal
+	Price     *price.Price
 }

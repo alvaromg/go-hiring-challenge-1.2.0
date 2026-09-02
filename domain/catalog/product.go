@@ -1,10 +1,10 @@
 package catalog
 
-import "github.com/shopspring/decimal"
+import "github.com/mytheresa/go-hiring-challenge/domain/price"
 
 type Product struct {
 	code     ProductCode
-	price    decimal.Decimal
+	price    price.Price
 	variants []Variant
 	category *Category
 }
@@ -13,7 +13,7 @@ func (p *Product) Code() ProductCode {
 	return p.code
 }
 
-func (p *Product) Price() decimal.Decimal {
+func (p *Product) Price() price.Price {
 	return p.price
 }
 
@@ -39,10 +39,10 @@ func (p *Product) fillVariantsPrices() {
 // ProductOption implements the functiona option pattern for products
 type ProductOption func(*Product)
 
-func RestoreProduct(code ProductCode, price decimal.Decimal, opts ...ProductOption) *Product {
+func RestoreProduct(code ProductCode, amount price.Price, opts ...ProductOption) *Product {
 	product := &Product{
 		code:     code,
-		price:    price,
+		price:    amount,
 		variants: []Variant{},
 		category: nil,
 	}

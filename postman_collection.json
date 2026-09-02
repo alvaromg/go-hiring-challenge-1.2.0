@@ -76,7 +76,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/categories?page=1&pageSize=101",
+          "raw": "{{baseUrl}}/categories",
           "host": [
             "{{baseUrl}}"
           ],
@@ -86,11 +86,13 @@
           "query": [
             {
               "key": "page",
-              "value": "1"
+              "value": "1",
+              "disabled": true
             },
             {
               "key": "pageSize",
-              "value": "101"
+              "value": "100",
+              "disabled": true
             }
           ]
         }
