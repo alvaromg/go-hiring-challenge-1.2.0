@@ -8,19 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// ApplyQuery applies the query criteria to a GORM DB instance
-func ApplyQuery(db *gorm.DB, q *query.Query, fieldsMapping map[string]string) *gorm.DB {
-	if q == nil {
-		return db
-	}
-
-	db = ApplyQueryFilters(db, q, fieldsMapping)
-	db = ApplyQuerySorts(db, q, fieldsMapping)
-	db = ApplyQueryPagination(db, q)
-
-	return db
-}
-
 func mappedField(fieldsMapping map[string]string, field string) string {
 	if mappedField, ok := fieldsMapping[field]; ok {
 		return mappedField

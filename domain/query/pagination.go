@@ -13,15 +13,9 @@ func NewPagination(page, pageSize int) Pagination {
 }
 
 func (p *Pagination) Page() int {
-	if p == nil {
-		return 0
-	}
 	return p.page
 }
 
 func (p *Pagination) PageSize() int {
-	if p == nil {
-		return 0
-	}
 	return p.pageSize
 }

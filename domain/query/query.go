@@ -45,17 +45,6 @@ func (q *Query) GetFilter(field string) *Filter {
 	return nil
 }
 
-func (q *Query) RemoveFilter(field string) *Query {
-	newFilters := make([]Filter, 0)
-	for _, f := range q.filters {
-		if f.Field() != field {
-			newFilters = append(newFilters, f)
-		}
-	}
-	q.filters = newFilters
-	return q
-}
-
 func (q *Query) AddFilters(filters ...Filter) *Query {
 	q.filters = append(q.filters, filters...)
 	return q
@@ -67,31 +56,8 @@ func (q *Query) AddSort(field string, desc bool) *Query {
 	return q
 }
 
-func (q *Query) HasSort(field string) bool {
-	for _, s := range q.sorts {
-		if s.Field() == field {
-			return true
-		}
-	}
-	return false
-}
-
-func (q *Query) RemoveSort(field string) *Query {
-	newSorts := make([]Sort, 0)
-	for _, s := range q.sorts {
-		if s.Field() != field {
-			newSorts = append(newSorts, s)
-		}
-	}
-	q.sorts = newSorts
-	return q
-}
-
 // SetPagination sets pagination parameters
 func (q *Query) AddPagination(page, pageSize int) *Query {
-	if q.pagination == nil {
-		q.pagination = &Pagination{}
-	}
 	*q.pagination = NewPagination(page, pageSize)
 	return q
 }

@@ -7,18 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Test enum for validation testing
-type testStatus struct{}
-
-func (testStatus) ValidValues() []string {
-	return []string{"active", "inactive", "pending"}
-}
-
 func TestQueryValidator(t *testing.T) {
 	// Create a validator with rules
 	validator := query.NewValidator().
 		AllowFilter("name", query.StringOperators(), query.ValidateString).
 		AllowFilter("age", query.NumericOperators(), query.ValidateInt).
+		AllowFilter("status", query.JustEqualOperator(), query.ValidateString).
 		AllowSort("name", "age")
 
 	t.Run("valid query", func(t *testing.T) {
@@ -26,7 +20,6 @@ func TestQueryValidator(t *testing.T) {
 			AddFilter("name", query.Eq, "John").
 			AddFilter("age", query.Gt, 18).
 			AddFilter("status", query.Eq, "active").
-			AddFilter("tenant_id", query.Eq, "tenant123").
 			AddSort("name", false).
 			AddSort("age", true)
 
@@ -36,8 +29,7 @@ func TestQueryValidator(t *testing.T) {
 
 	t.Run("invalid field", func(t *testing.T) {
 		query := query.New().
-			AddFilter("invalid_field", query.Eq, "value").
-			AddFilter("tenant_id", query.Eq, "tenant123")
+			AddFilter("invalid_field", query.Eq, "value")
 
 		err := validator.Validate(query)
 		assert.Error(t, err)
@@ -46,8 +38,7 @@ func TestQueryValidator(t *testing.T) {
 
 	t.Run("invalid operator", func(t *testing.T) {
 		query := query.New().
-			AddFilter("name", query.Gt, "John").
-			AddFilter("tenant_id", query.Eq, "tenant123")
+			AddFilter("name", query.Gt, "John")
 
 		err := validator.Validate(query)
 		assert.Error(t, err)
@@ -56,27 +47,15 @@ func TestQueryValidator(t *testing.T) {
 
 	t.Run("invalid value type", func(t *testing.T) {
 		query := query.New().
-			AddFilter("age", query.Eq, "not a number").
-			AddFilter("tenant_id", query.Eq, "tenant123")
+			AddFilter("age", query.Eq, "not a number")
 
 		err := validator.Validate(query)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid value for field \"age\"")
 	})
 
-	t.Run("invalid enum value", func(t *testing.T) {
-		query := query.New().
-			AddFilter("status", query.Eq, "invalid_status").
-			AddFilter("tenant_id", query.Eq, "tenant123")
-
-		err := validator.Validate(query)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid value for field \"status\"")
-	})
-
 	t.Run("invalid sort field", func(t *testing.T) {
 		query := query.New().
-			AddFilter("tenant_id", query.Eq, "tenant123").
 			AddSort("invalid_sort", false)
 
 		err := validator.Validate(query)
@@ -88,25 +67,6 @@ func TestQueryValidator(t *testing.T) {
 		err := validator.Validate(nil)
 		assert.NoError(t, err)
 	})
-
-	t.Run("empty query", func(t *testing.T) {
-		query := query.New()
-		err := validator.Validate(query)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "missing required filter for field \"tenant_id\"")
-	})
-
-	t.Run("missing required filter", func(t *testing.T) {
-		query := query.New().
-			AddFilter("name", query.Eq, "John").
-			AddFilter("age", query.Gt, 18).
-			AddSort("name", false)
-
-		err := validator.Validate(query)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "missing required filter for field \"tenant_id\"")
-	})
-
 }
 
 func TestHelperFunctions(t *testing.T) {
@@ -137,6 +97,23 @@ func TestHelperFunctions(t *testing.T) {
 		assert.NoError(t, query.ValidateInt(123))
 		assert.Error(t, query.ValidateInt("test"))
 		assert.Error(t, query.ValidateInt(12.3))
+	})
+
+	t.Run("ValidatePrice", func(t *testing.T) {
+		assert.NoError(t, query.ValidatePrice("19.99"))
+		assert.Error(t, query.ValidatePrice("not a price"))
+		assert.Error(t, query.ValidatePrice(19.99))
+	})
+
+	t.Run("ValidateBool", func(t *testing.T) {
+		assert.NoError(t, query.ValidateBool(true))
+		assert.NoError(t, query.ValidateBool(false))
+		assert.NoError(t, query.ValidateBool("true"))
+		assert.NoError(t, query.ValidateBool("false"))
+		assert.NoError(t, query.ValidateBool("1"))
+		assert.NoError(t, query.ValidateBool("0"))
+		assert.Error(t, query.ValidateBool("not a bool"))
+		assert.Error(t, query.ValidateBool(123))
 	})
 
 	t.Run("ValidateNumeric", func(t *testing.T) {

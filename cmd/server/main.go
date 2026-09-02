@@ -45,6 +45,7 @@ func main() {
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_LOG_LEVEL"),
 	)
+	//nolint: errcheck
 	defer close()
 
 	// Initialize repositories
@@ -75,6 +76,9 @@ func main() {
 
 	<-ctx.Done()
 	logger.Infof("Shutting down server...")
-	srv.Shutdown(ctx)
+	err = srv.Shutdown(ctx)
+	if err != nil {
+		log.Fatalf("Server shutdown failed: %s", err)
+	}
 	stop()
 }

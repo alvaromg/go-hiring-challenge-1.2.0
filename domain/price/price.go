@@ -15,6 +15,10 @@ type Price struct {
 	value decimal.Decimal
 }
 
+func (p Price) Equal(other Price) bool {
+	return p.value.Equal(other.value)
+}
+
 // New creates a Price from a decimal value.
 func New(value decimal.Decimal) Price {
 	return Price{value: value}

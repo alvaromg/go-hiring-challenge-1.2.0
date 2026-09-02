@@ -18,6 +18,10 @@ type ProductCode struct {
 	value uint
 }
 
+func (cc ProductCode) Equal(other ProductCode) bool {
+	return cc.value == other.value
+}
+
 // NewProductCode creates a new ProductCode, enforcing its domain invariants.
 func NewProductCode(value uint) (ProductCode, error) {
 	if value > maxProductCodeValue {
@@ -39,11 +43,6 @@ func ParseProductCode(code string) (ProductCode, error) {
 	}
 
 	return NewProductCode(uint(value))
-}
-
-// Value returns the underlying numeric identifier.
-func (code ProductCode) Value() uint {
-	return code.value
 }
 
 // String returns the formatted product code, e.g. "PROD001".

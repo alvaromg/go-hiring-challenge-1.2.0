@@ -13,15 +13,9 @@ func NewSort(field string, desc bool) Sort {
 }
 
 func (s *Sort) Field() string {
-	if s == nil {
-		return ""
-	}
 	return s.field
 }
 
 func (s *Sort) Desc() bool {
-	if s == nil {
-		return false
-	}
 	return s.desc
 }

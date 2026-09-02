@@ -26,6 +26,7 @@ func main() {
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_LOG_LEVEL"),
 	)
+	//nolint: errcheck
 	defer close()
 
 	dir := os.Getenv("POSTGRES_SQL_DIR")

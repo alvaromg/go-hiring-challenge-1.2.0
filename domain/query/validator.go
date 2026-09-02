@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
-	"time"
 
 	"github.com/mytheresa/go-hiring-challenge/domain/price"
 )
@@ -66,17 +65,6 @@ func (v *validator) AllowFilter(field string, allowedOperators []Operator, valid
 	return v
 }
 
-// RequireFilter adds a mandatory filter validation rule
-func (v *validator) RequireFilter(field string, allowedOperators []Operator, validateValue func(value any) error) *validator {
-	v.allowedFilters = append(v.allowedFilters, filterValidation{
-		field:            field,
-		allowedOperators: allowedOperators,
-		validateValue:    validateValue,
-		required:         true,
-	})
-	return v
-}
-
 // AllowSort adds a sort validation rule
 func (v *validator) AllowSort(field ...string) *validator {
 	for _, f := range field {
@@ -93,12 +81,6 @@ func (v *validator) Validate(query *Query) error {
 		return nil
 	}
 
-	// Check for required filters
-	err := v.validateRequiredFilters(query)
-	if err != nil {
-		return err
-	}
-
 	// Validate filters
 	for _, filter := range query.Filters() {
 		if err := v.validateFilter(filter); err != nil {
@@ -110,24 +92,6 @@ func (v *validator) Validate(query *Query) error {
 	for _, sort := range query.Sorts() {
 		if err := v.validateSort(sort); err != nil {
 			return err
-		}
-	}
-
-	return nil
-}
-
-// validateRequiredFilters checks if all required filters are present
-func (v *validator) validateRequiredFilters(query *Query) error {
-	// Build a map of provided filter fields for quick lookup
-	providedFields := make(map[string]bool)
-	for _, filter := range query.Filters() {
-		providedFields[filter.Field()] = true
-	}
-
-	// Check if required filters are present
-	for _, filterValidation := range v.allowedFilters {
-		if filterValidation.required && !providedFields[filterValidation.field] {
-			return newErrInvalidQuery("missing required filter for field %q", filterValidation.field)
 		}
 	}
 
@@ -183,19 +147,7 @@ func (v *validator) findFilterValidation(field string) (filterValidation, error)
 // ValidateString validates that the value is a string
 func ValidateString(value any) error {
 	if _, ok := value.(string); !ok {
-		return errors.New("value must be a string")
-	}
-	return nil
-}
-
-func ValidateDate(value any) error {
-	dateStr, ok := value.(string)
-	if !ok {
-		return newErrInvalidQuery("value must be a date string")
-	}
-
-	if _, err := time.Parse(time.DateOnly, dateStr); err != nil {
-		return newErrInvalidQuery("invalid date format %q", dateStr)
+		return fmt.Errorf("value must be a string")
 	}
 	return nil
 }
@@ -240,16 +192,6 @@ func ValidateInt(value any) error {
 		return nil
 	default:
 		return errors.New("value must be an integer")
-	}
-}
-
-// ValidateFloat validates that the value is a float
-func ValidateFloat(value any) error {
-	switch value.(type) {
-	case float32, float64:
-		return nil
-	default:
-		return errors.New("value must be a float")
 	}
 }
 

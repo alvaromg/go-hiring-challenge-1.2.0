@@ -21,24 +21,18 @@ func (v *variant) TableName() string {
 	return "product_variants"
 }
 
-func variantToDomain(dbVariant variant) catalog.Variant {
+func variantToDomain(dbVariant variant) *catalog.Variant {
 	var variantPrice *price.Price
 	if dbVariant.Price != nil {
 		p := price.New(*dbVariant.Price)
 		variantPrice = &p
 	}
 
-	return catalog.Variant{
-		ID:        dbVariant.ID,
-		ProductID: dbVariant.ProductID,
-		Name:      dbVariant.Name,
-		SKU:       dbVariant.SKU,
-		Price:     variantPrice,
-	}
+	return catalog.RestoreVariant(dbVariant.Name, dbVariant.SKU, variantPrice)
 }
 
-func variantsToDomain(dbVariants []variant) []catalog.Variant {
-	variants := make([]catalog.Variant, len(dbVariants))
+func variantsToDomain(dbVariants []variant) []*catalog.Variant {
+	variants := make([]*catalog.Variant, len(dbVariants))
 	for i, dbVariant := range dbVariants {
 		variants[i] = variantToDomain(dbVariant)
 	}

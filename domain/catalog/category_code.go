@@ -18,6 +18,10 @@ type CategoryCode struct {
 	value uint
 }
 
+func (cc CategoryCode) Equal(other CategoryCode) bool {
+	return cc.value == other.value
+}
+
 // NewCategoryCode creates a new CategoryCode, enforcing its domain invariants.
 func NewCategoryCode(value uint) (CategoryCode, error) {
 	if value > maxCategoryCodeValue {
@@ -39,11 +43,6 @@ func ParseCategoryCode(code string) (CategoryCode, error) {
 	}
 
 	return NewCategoryCode(uint(value))
-}
-
-// Value returns the underlying numeric identifier.
-func (code CategoryCode) Value() uint {
-	return code.value
 }
 
 // String returns the formatted category code, e.g. "CAT001".

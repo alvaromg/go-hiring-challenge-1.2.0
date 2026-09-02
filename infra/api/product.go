@@ -22,11 +22,11 @@ type product struct {
 	Variants []variant   `json:"variants"`
 }
 
-func encodeVariantResponse(v catalog.Variant) variant {
+func encodeVariantResponse(v *catalog.Variant) variant {
 	return variant{
-		Name:  v.Name,
-		SKU:   v.SKU,
-		Price: v.Price,
+		Name:  v.Name(),
+		SKU:   v.SKU(),
+		Price: v.Price(),
 	}
 }
 
