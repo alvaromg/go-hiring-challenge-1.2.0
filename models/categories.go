@@ -15,24 +15,34 @@ func (c *category) TableName() string {
 	return "categories"
 }
 
-func categoryToDomain(dbCategory *category) *catalog.Category {
+func categoryToDomain(dbCategory *category) (*catalog.Category, error) {
 	if dbCategory == nil {
-		return nil
+		return nil, nil
 	}
-	return catalog.RestoreCategory(dbCategory.Code, dbCategory.Name)
+
+	id, err := catalog.ParseCategoryCode(dbCategory.Code)
+	if err != nil {
+		return nil, err
+	}
+
+	return catalog.RestoreCategory(id, dbCategory.Name), nil
 }
 
-func categoriesToDomain(dbCategories []category) []*catalog.Category {
+func categoriesToDomain(dbCategories []category) ([]*catalog.Category, error) {
 	categories := make([]*catalog.Category, len(dbCategories))
 	for i, dbCategory := range dbCategories {
-		categories[i] = categoryToDomain(&dbCategory)
+		c, err := categoryToDomain(&dbCategory)
+		if err != nil {
+			return nil, err
+		}
+		categories[i] = c
 	}
-	return categories
+	return categories, nil
 }
 
 func categoryFromDomain(c *catalog.Category) category {
 	return category{
-		Code: c.Code(),
+		Code: c.Code().String(),
 		Name: c.Name(),
 	}
 }

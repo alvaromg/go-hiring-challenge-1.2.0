@@ -20,17 +20,31 @@ func (p *product) TableName() string {
 	return "products"
 }
 
-func productToDomain(dbProduct product) *catalog.Product {
-	return catalog.RestoreProduct(dbProduct.Code, dbProduct.Price,
-		catalog.ProductWithCategory(categoryToDomain(dbProduct.Category)),
+func productToDomain(dbProduct product) (*catalog.Product, error) {
+	id, err := catalog.ParseProductCode(dbProduct.Code)
+	if err != nil {
+		return nil, err
+	}
+
+	cat, err := categoryToDomain(dbProduct.Category)
+	if err != nil {
+		return nil, err
+	}
+
+	return catalog.RestoreProduct(id, dbProduct.Price,
+		catalog.ProductWithCategory(cat),
 		catalog.ProductWithVariants(variantsToDomain(dbProduct.Variants)...),
-	)
+	), nil
 }
 
-func productsToDomain(dbProducts []product) []*catalog.Product {
+func productsToDomain(dbProducts []product) ([]*catalog.Product, error) {
 	products := make([]*catalog.Product, len(dbProducts))
 	for i, dbProduct := range dbProducts {
-		products[i] = productToDomain(dbProduct)
+		p, err := productToDomain(dbProduct)
+		if err != nil {
+			return nil, err
+		}
+		products[i] = p
 	}
-	return products
+	return products, nil
 }

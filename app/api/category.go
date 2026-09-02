@@ -11,7 +11,7 @@ type category struct {
 
 func encodeCategoryResponse(c *catalog.Category) category {
 	return category{
-		Code: c.Code(),
+		Code: c.Code().String(),
 		Name: c.Name(),
 	}
 }

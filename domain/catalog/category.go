@@ -10,11 +10,11 @@ import (
 const maxCategoryNameLength = 256
 
 type Category struct {
-	code string
+	code CategoryCode
 	name string
 }
 
-func (c *Category) Code() string {
+func (c *Category) Code() CategoryCode {
 	return c.code
 }
 
@@ -23,10 +23,7 @@ func (c *Category) Name() string {
 }
 
 // NewCategory creates a new Category, enforcing its domain invariants.
-func NewCategory(code, name string) (*Category, error) {
-	if code == "" {
-		return nil, fmt.Errorf("%w: category code must not be empty", domainerrors.ErrorDomainValidation)
-	}
+func NewCategory(code CategoryCode, name string) (*Category, error) {
 	if name == "" {
 		return nil, fmt.Errorf("%w: category name must not be empty", domainerrors.ErrorDomainValidation)
 	}
@@ -41,7 +38,7 @@ func NewCategory(code, name string) (*Category, error) {
 }
 
 // RestoreCategory reconstructs a Category from already validated data, e.g. when loading it from persistence.
-func RestoreCategory(code, name string) *Category {
+func RestoreCategory(code CategoryCode, name string) *Category {
 	category := &Category{
 		code: code,
 		name: name,

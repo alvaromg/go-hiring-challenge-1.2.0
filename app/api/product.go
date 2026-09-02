@@ -43,21 +43,29 @@ func encodeProductResponse(p *catalog.Product) product {
 	}
 
 	return product{
-		Code:     p.Code(),
+		Code:     p.Code().String(),
 		Price:    p.Price(),
 		Category: cat,
 		Variants: variants,
 	}
 }
 
-func encodeProductDataResponse(p *catalog.Product) (product, error) {
-	return encodeProductResponse(p), nil
+func decodeProductCodeFromRequest(r *http.Request) (catalog.ProductCode, error) {
+	var zero catalog.ProductCode
+
+	codeStr := r.PathValue("code")
+	if codeStr == "" {
+		return zero, fmt.Errorf("%w: missing product code", rest.ErrorBadRequest)
+	}
+
+	productCode, err := catalog.ParseProductCode(codeStr)
+	if err != nil {
+		return zero, fmt.Errorf("%w: %s", rest.ErrorBadRequest, err)
+	}
+
+	return productCode, nil
 }
 
-func decodeProductCodeFromRequest(r *http.Request) (string, error) {
-	code := r.PathValue("code")
-	if code == "" {
-		return "", fmt.Errorf("%w: missing product code", rest.ErrorBadRequest)
-	}
-	return code, nil
+func encodeProductDetailResponse(p *catalog.Product) (product, error) {
+	return encodeProductResponse(p), nil
 }

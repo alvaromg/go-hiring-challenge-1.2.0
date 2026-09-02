@@ -48,8 +48,12 @@ func (r *CategoriesRepository) GetCategories(q *query.Query) (list.ListResponse[
 	}
 
 	// build page response with domain categories
+	domainCategories, err := categoriesToDomain(categories)
+	if err != nil {
+		return listRes, fmt.Errorf("%w: error mapping categories: %s", libmodel.ErrorPersistence, err)
+	}
 	listRes.SetTotal(uint(total))
-	listRes.AddItems(categoriesToDomain(categories)...)
+	listRes.AddItems(domainCategories...)
 
 	return listRes, nil
 }
@@ -68,5 +72,10 @@ func (r *CategoriesRepository) CreateCategories(categories []*catalog.Category) 
 		return nil, fmt.Errorf("%w: error creating categories: %s", libmodel.ErrorPersistence, err)
 	}
 
-	return categoriesToDomain(dbCategories), nil
+	domainCategories, err := categoriesToDomain(dbCategories)
+	if err != nil {
+		return nil, fmt.Errorf("%w: error mapping categories: %s", libmodel.ErrorPersistence, err)
+	}
+
+	return domainCategories, nil
 }

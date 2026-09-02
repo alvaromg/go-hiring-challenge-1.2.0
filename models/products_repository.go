@@ -93,13 +93,17 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 	}
 
 	// build page response with domain products
+	domainProducts, err := productsToDomain(products)
+	if err != nil {
+		return listRes, fmt.Errorf("%w: error mapping products: %s", libmodel.ErrorPersistence, err)
+	}
 	listRes.SetTotal(uint(total))
-	listRes.AddItems(productsToDomain(products)...)
+	listRes.AddItems(domainProducts...)
 
 	return listRes, nil
 }
 
-func (r *ProductsRepository) GetProductByCode(code string) (*catalog.Product, error) {
+func (r *ProductsRepository) GetProductByCode(code catalog.ProductCode) (*catalog.Product, error) {
 	var p product
 	err := r.db.Preload("Variants").Preload("Category").Where("code = ?", code).First(&p).Error
 	if err != nil {
@@ -109,5 +113,10 @@ func (r *ProductsRepository) GetProductByCode(code string) (*catalog.Product, er
 		return nil, fmt.Errorf("%w: error retrieving product: %s", libmodel.ErrorPersistence, err)
 	}
 
-	return productToDomain(p), nil
+	domainProduct, err := productToDomain(p)
+	if err != nil {
+		return nil, fmt.Errorf("%w: error mapping product: %s", libmodel.ErrorPersistence, err)
+	}
+
+	return domainProduct, nil
 }

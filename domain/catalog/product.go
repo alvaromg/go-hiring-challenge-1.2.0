@@ -3,13 +3,13 @@ package catalog
 import "github.com/shopspring/decimal"
 
 type Product struct {
-	code     string
+	code     ProductCode
 	price    decimal.Decimal
 	variants []Variant
 	category *Category
 }
 
-func (p *Product) Code() string {
+func (p *Product) Code() ProductCode {
 	return p.code
 }
 
@@ -39,7 +39,7 @@ func (p *Product) fillVariantsPrices() {
 // ProductOption implements the functiona option pattern for products
 type ProductOption func(*Product)
 
-func RestoreProduct(code string, price decimal.Decimal, opts ...ProductOption) *Product {
+func RestoreProduct(code ProductCode, price decimal.Decimal, opts ...ProductOption) *Product {
 	product := &Product{
 		code:     code,
 		price:    price,

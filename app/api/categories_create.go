@@ -28,8 +28,14 @@ func decodeCreateCategoriesFromRequest(r *http.Request) (catalogapp.CreateCatego
 
 	requested := make([]catalogapp.RequestedCategory, len(req.Categories))
 	for i, c := range req.Categories {
+
+		code, err := catalog.ParseCategoryCode(c.Code)
+		if err != nil {
+			return zero, err
+		}
+
 		requested[i] = catalogapp.RequestedCategory{
-			Code: c.Code,
+			Code: code,
 			Name: c.Name,
 		}
 	}
