@@ -36,7 +36,7 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 	// strict query validation
 	validator := query.NewValidator().
 		AllowFilter(FieldCategory, []query.Operator{query.Eq}, query.ValidateString).
-		AllowFilter(FieldPrice, []query.Operator{query.Lt}, query.ValidateString)
+		AllowFilter(FieldPrice, []query.Operator{query.Lt}, query.ValidatePrice)
 	if err := validator.Validate(q); err != nil {
 		return listRes, err
 	}

@@ -6,6 +6,8 @@ import (
 	"slices"
 	"strconv"
 	"time"
+
+	"github.com/mytheresa/go-hiring-challenge/domain/price"
 )
 
 var ErrorInvalidQuery = errors.New("invalid query")
@@ -195,6 +197,20 @@ func ValidateDate(value any) error {
 	if _, err := time.Parse(time.DateOnly, dateStr); err != nil {
 		return newErrInvalidQuery("invalid date format %q", dateStr)
 	}
+	return nil
+}
+
+// ValidatePrice validates that the value is a valid price string, e.g. "19.99"
+func ValidatePrice(value any) error {
+	str, ok := value.(string)
+	if !ok {
+		return errors.New("value must be a valid price")
+	}
+
+	if _, err := price.Parse(str); err != nil {
+		return fmt.Errorf("price %q is not valid", value)
+	}
+
 	return nil
 }
 
