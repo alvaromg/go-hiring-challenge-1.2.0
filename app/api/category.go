@@ -7,9 +7,9 @@ type category struct {
 	Name string `json:"name"`
 }
 
-func encodeCategoryResponse(c catalog.Category) category {
+func encodeCategoryResponse(c *catalog.Category) category {
 	return category{
-		Code: c.Code,
-		Name: c.Name,
+		Code: c.Code(),
+		Name: c.Name(),
 	}
 }

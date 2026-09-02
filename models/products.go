@@ -21,13 +21,10 @@ func (p *product) TableName() string {
 }
 
 func productToDomain(dbProduct product) *catalog.Product {
-	product := &catalog.Product{
-		Code:     dbProduct.Code,
-		Price:    dbProduct.Price,
-		Variants: variantsToDomain(dbProduct.Variants),
-		Category: categoryToDomainPtr(dbProduct.Category),
-	}
-	return product
+	return catalog.RestoreProduct(dbProduct.Code, dbProduct.Price,
+		catalog.ProductWithCategory(categoryToDomain(dbProduct.Category)),
+		catalog.ProductWithVariants(variantsToDomain(dbProduct.Variants)...),
+	)
 }
 
 func productsToDomain(dbProducts []product) []*catalog.Product {

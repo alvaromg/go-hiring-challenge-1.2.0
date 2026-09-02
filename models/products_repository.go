@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
@@ -96,4 +97,17 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 	listRes.AddItems(productsToDomain(products)...)
 
 	return listRes, nil
+}
+
+func (r *ProductsRepository) GetProductByCode(code string) (*catalog.Product, error) {
+	var p product
+	err := r.db.Preload("Variants").Preload("Category").Where("code = ?", code).First(&p).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("%w: product %q not found", domainerrors.ErrorNotFound, code)
+		}
+		return nil, fmt.Errorf("%w: error retrieving product: %s", libmodel.ErrorPersistence, err)
+	}
+
+	return productToDomain(p), nil
 }

@@ -15,17 +15,9 @@ func (c *category) TableName() string {
 	return "categories"
 }
 
-func categoryToDomain(dbCategory category) catalog.Category {
-	return catalog.Category{
-		Code: dbCategory.Code,
-		Name: dbCategory.Name,
-	}
-}
-
-func categoryToDomainPtr(dbCategory *category) *catalog.Category {
+func categoryToDomain(dbCategory *category) *catalog.Category {
 	if dbCategory == nil {
 		return nil
 	}
-	c := categoryToDomain(*dbCategory)
-	return &c
+	return catalog.RestoreCategory(dbCategory.Code, dbCategory.Name)
 }

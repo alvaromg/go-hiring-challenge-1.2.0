@@ -7,5 +7,5 @@ type Variant struct {
 	ProductID uint
 	Name      string
 	SKU       string
-	Price     decimal.Decimal
+	Price     *decimal.Decimal
 }
