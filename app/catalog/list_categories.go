@@ -8,7 +8,7 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
 )
 
-func (app *App) GetCategories(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Category], error) {
+func (app *App) ListCategories(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Category], error) {
 	var zero list.ListResponse[*catalog.Category]
 
 	res, err := app.categoriesRepo.GetCategories(q)

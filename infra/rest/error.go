@@ -34,10 +34,10 @@ func HandleHTTPError(log shared.Logger, w http.ResponseWriter, r *http.Request, 
 	e := encodeErrorResponse(r.Context(), err)
 	jsonOutput, err := json.Marshal(e)
 	if err != nil {
-		panic(err)
+		log.WithContext(r.Context()).Errorf("error encoding http response: %s", err)
 	}
 	if _, err := w.Write(jsonOutput); err != nil {
-		panic(err)
+		log.WithContext(r.Context()).Errorf("error writing http response: %s", err)
 	}
 }
 

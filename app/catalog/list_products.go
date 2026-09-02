@@ -12,7 +12,7 @@ type GetProductsInput struct {
 	Query *query.Query
 }
 
-func (app *App) GetProducts(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Product], error) {
+func (app *App) ListProducts(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Product], error) {
 	var zero list.ListResponse[*catalog.Product]
 
 	res, err := app.productsRepo.GetAllProducts(q)

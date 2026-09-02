@@ -22,21 +22,21 @@ func NewCategoriesRepository(db *gorm.DB) *CategoriesRepository {
 }
 
 func (r *CategoriesRepository) GetCategories(q *query.Query) (list.ListResponse[*catalog.Category], error) {
-	var listRes list.ListResponse[*catalog.Category]
+	var zero list.ListResponse[*catalog.Category]
 
 	// strict query validation: only pagination is allowed, no filters or sorts
 	validator := query.NewValidator()
 	if err := validator.Validate(q); err != nil {
-		return listRes, err
+		return zero, err
 	}
 
 	// count all categories
 	var total int64
 	if err := r.db.Model(&category{}).Count(&total).Error; err != nil {
-		return listRes, fmt.Errorf("%w: error counting categories: %s", libmodel.ErrorPersistence, err)
+		return zero, fmt.Errorf("%w: error counting categories: %s", libmodel.ErrorPersistence, err)
 	}
 	if total == 0 {
-		return listRes, nil
+		return zero, nil
 	}
 
 	// apply pagination to find categories in page
@@ -44,18 +44,20 @@ func (r *CategoriesRepository) GetCategories(q *query.Query) (list.ListResponse[
 
 	var categories []category
 	if err := db.Find(&categories).Error; err != nil {
-		return listRes, fmt.Errorf("%w: error retrieving categories: %s", libmodel.ErrorPersistence, err)
+		return zero, fmt.Errorf("%w: error retrieving categories: %s", libmodel.ErrorPersistence, err)
 	}
 
 	// build page response with domain categories
 	domainCategories, err := categoriesToDomain(categories)
 	if err != nil {
-		return listRes, fmt.Errorf("%w: error mapping categories: %s", libmodel.ErrorPersistence, err)
+		return zero, fmt.Errorf("%w: error mapping categories: %s", libmodel.ErrorPersistence, err)
 	}
-	listRes.SetTotal(uint(total))
-	listRes.AddItems(domainCategories...)
 
-	return listRes, nil
+	listResp := list.NewListResponse[*catalog.Category]()
+	listResp.SetTotal(uint(total))
+	listResp.AddItems(domainCategories...)
+
+	return listResp, nil
 }
 
 // CreateCategories persists all given categories in a single transaction.
