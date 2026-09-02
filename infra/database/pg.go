@@ -3,8 +3,6 @@ package database
 import (
 	"fmt"
 	"log"
-	"os"
-	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -22,7 +20,7 @@ func New(user, password, dbname, port, logLevel string) (db *gorm.DB, close func
 	}
 
 	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		newJSONLogWriter(),
 		logger.Config{
 			SlowThreshold:             time.Second, // Slow SQL threshold
 			LogLevel:                  dbLogLevel,  // Log level
@@ -45,24 +43,4 @@ func New(user, password, dbname, port, logLevel string) (db *gorm.DB, close func
 	}
 
 	return db, sqlDB.Close
-}
-
-func parseLogLevel(level string) (logger.LogLevel, error) {
-
-	level = strings.ToLower(level)
-
-	switch level {
-	case "silent":
-		return logger.Silent, nil
-	case "error":
-		return logger.Error, nil
-	case "warn":
-		return logger.Warn, nil
-	case "info":
-		return logger.Info, nil
-	case "":
-		return logger.Silent, fmt.Errorf("database log level is empty")
-	default:
-		return logger.Silent, fmt.Errorf("unknown database log level %q", level)
-	}
 }
