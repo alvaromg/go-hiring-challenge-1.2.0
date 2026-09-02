@@ -13,3 +13,11 @@ func encodeCategoryResponse(c *catalog.Category) category {
 		Name: c.Name(),
 	}
 }
+
+type categoriesData struct {
+	Categories []category `json:"categories"`
+}
+
+func wrapCategoriesResponse(categories []category) categoriesData {
+	return categoriesData{Categories: categories}
+}

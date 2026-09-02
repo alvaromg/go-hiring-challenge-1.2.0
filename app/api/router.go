@@ -13,8 +13,9 @@ type Middleware func(http.Handler) http.Handler
 func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /catalog", rest.NewListByQueryHandle(monitor, catalogApp.GetProducts, encodeProductResponse))
+	mux.HandleFunc("GET /catalog", rest.NewListByQueryHandle(monitor, catalogApp.GetProducts, encodeProductResponse, wrapProductsResponse))
 	mux.HandleFunc("GET /catalog/{code}", rest.NewHandler(monitor, catalogApp.GetProduct, decodeProductCodeFromRequest, encodeProductDataResponse, http.StatusOK))
+	mux.HandleFunc("GET /categories", rest.NewListByQueryHandle(monitor, catalogApp.GetCategories, encodeCategoryResponse, wrapCategoriesResponse))
 
 	return chainMiddlewares(mux, rest.OperationIdMiddleware, rest.NewLoggingMiddleware(monitor.Logger()))
 }

@@ -9,10 +9,11 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/shared"
 )
 
-func NewListByQueryHandle[DO, RO any](
+func NewListByQueryHandle[DO, RO, WD any](
 	monitor shared.Monitor,
 	appHandler func(context.Context, *query.Query) (list.ListResponse[DO], error),
 	itemEncoder func(DO) RO,
+	dataWrapper func([]RO) WD,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		q, err := DecodeQueryFromRequest(r)
@@ -28,6 +29,6 @@ func NewListByQueryHandle[DO, RO any](
 		}
 
 		w.Header().Add("Content-Type", "application/json")
-		EncodeListResponse(monitor.Logger(), r.Context(), itemEncoder, out, q, w, r)
+		EncodeListResponse(monitor.Logger(), r.Context(), itemEncoder, dataWrapper, out, q, w, r)
 	}
 }

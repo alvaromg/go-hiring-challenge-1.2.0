@@ -1,11 +1,13 @@
 package catalog
 
 type App struct {
-	productsRepo ProductsRepository
+	productsRepo   ProductsRepository
+	categoriesRepo CategoriesRepository
 }
 
-func NewCatalogApp(productsRepo ProductsRepository) *App {
+func NewCatalogApp(productsRepo ProductsRepository, categoriesRepo CategoriesRepository) *App {
 	return &App{
-		productsRepo: productsRepo,
+		productsRepo:   productsRepo,
+		categoriesRepo: categoriesRepo,
 	}
 }

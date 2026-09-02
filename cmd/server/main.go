@@ -48,10 +48,11 @@ func main() {
 	defer close()
 
 	// Initialize repositories
-	prodRepo := models.NewProductsRepository(db)
+	productsRepo := models.NewProductsRepository(db)
+	categoriesRepo := models.NewCategoriesRepository(db)
 
 	// Initialize applications
-	catalogApp := catalog.NewCatalogApp(prodRepo)
+	catalogApp := catalog.NewCatalogApp(productsRepo, categoriesRepo)
 
 	// Set up routing
 	router := api.NewApiRouter(monitor, catalogApp)

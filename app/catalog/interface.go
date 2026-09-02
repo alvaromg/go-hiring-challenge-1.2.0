@@ -10,3 +10,7 @@ type ProductsRepository interface {
 	GetAllProducts(q *query.Query) (list.ListResponse[*catalog.Product], error)
 	GetProductByCode(code string) (*catalog.Product, error)
 }
+
+type CategoriesRepository interface {
+	GetCategories(q *query.Query) (list.ListResponse[*catalog.Category], error)
+}

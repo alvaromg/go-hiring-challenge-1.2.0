@@ -45,6 +45,57 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Get product",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/catalog/:code",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "catalog",
+            ":code"
+          ],
+          "variable": [
+            {
+              "key": "code",
+              "value": "PROD001"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/categories?page=1&pageSize=101",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "categories"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "101"
+            }
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "event": [

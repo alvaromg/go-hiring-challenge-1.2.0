@@ -21,3 +21,11 @@ func categoryToDomain(dbCategory *category) *catalog.Category {
 	}
 	return catalog.RestoreCategory(dbCategory.Code, dbCategory.Name)
 }
+
+func categoriesToDomain(dbCategories []category) []*catalog.Category {
+	categories := make([]*catalog.Category, len(dbCategories))
+	for i, dbCategory := range dbCategories {
+		categories[i] = categoryToDomain(&dbCategory)
+	}
+	return categories
+}

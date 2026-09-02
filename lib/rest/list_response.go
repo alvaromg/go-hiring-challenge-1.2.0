@@ -14,7 +14,7 @@ import (
 
 type ListResponse[T any] struct {
 	Metadata ListResponseMetadata `json:"metadata"`
-	Data     []T                  `json:"data"`
+	Data     T                    `json:"data"`
 }
 
 type ListResponseMetadata struct {
@@ -25,10 +25,14 @@ type ListResponseMetadata struct {
 	PageCount   int    `json:"pageCount"`
 }
 
-func EncodeListResponse[DO, RO any](
+// EncodeListResponse encodes a paginated domain list into the HTTP response.
+// Each item is encoded via itemEncoder, then the resulting items are wrapped
+// into a data envelope (e.g. {"products": [...]}) via dataWrapper.
+func EncodeListResponse[DO, RO, WD any](
 	log shared.Logger,
 	ctx context.Context,
 	itemEncoder func(DO) RO,
+	dataWrapper func([]RO) WD,
 	out list.ListResponse[DO],
 	query *query.Query,
 	w http.ResponseWriter,
@@ -36,7 +40,12 @@ func EncodeListResponse[DO, RO any](
 ) {
 	pageCount := math.Ceil(float64(out.Total()) / float64((query.Pagination().PageSize())))
 
-	restOut := ListResponse[RO]{
+	items := make([]RO, 0, len(out.Items()))
+	for i := range out.Items() {
+		items = append(items, itemEncoder(out.Items()[i]))
+	}
+
+	restOut := ListResponse[WD]{
 		Metadata: ListResponseMetadata{
 			OperationId: operation.IdFromContext(ctx),
 			TotalCount:  out.Total(),
@@ -44,13 +53,7 @@ func EncodeListResponse[DO, RO any](
 			PageSize:    query.Pagination().PageSize(),
 			PageCount:   int(pageCount),
 		},
-		Data: []RO{},
-	}
-
-	if len(out.Items()) > 0 {
-		for i := range out.Items() {
-			restOut.Data = append(restOut.Data, itemEncoder(out.Items()[i]))
-		}
+		Data: dataWrapper(items),
 	}
 
 	jsonOutput, err := json.Marshal(restOut)
