@@ -8,8 +8,6 @@ import (
 
 type Monitor interface {
 	Logger() Logger
-	// Tracer() libmonitor.Tracer
-	// Meter() libmonitor.Meter
 }
 
 type Logger interface {

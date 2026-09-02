@@ -3,7 +3,7 @@ package rest
 import (
 	"net/http"
 
-	"github.com/mytheresa/go-hiring-challenge/lib/operation"
+	"github.com/mytheresa/go-hiring-challenge/infra/operation"
 )
 
 func OperationIdMiddleware(next http.Handler) http.Handler {

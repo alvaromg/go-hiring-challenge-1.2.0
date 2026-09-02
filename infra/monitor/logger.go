@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/mytheresa/go-hiring-challenge/lib/operation"
+	"github.com/mytheresa/go-hiring-challenge/infra/operation"
 	"github.com/sirupsen/logrus"
 )
 

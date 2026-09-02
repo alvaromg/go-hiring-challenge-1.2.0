@@ -10,11 +10,11 @@ import (
 	"syscall"
 
 	"github.com/joho/godotenv"
-	"github.com/mytheresa/go-hiring-challenge/app/api"
 	"github.com/mytheresa/go-hiring-challenge/app/catalog"
-	"github.com/mytheresa/go-hiring-challenge/app/database"
-	"github.com/mytheresa/go-hiring-challenge/lib/monitor"
-	"github.com/mytheresa/go-hiring-challenge/models"
+	"github.com/mytheresa/go-hiring-challenge/infra/api"
+	"github.com/mytheresa/go-hiring-challenge/infra/database"
+	"github.com/mytheresa/go-hiring-challenge/infra/models"
+	"github.com/mytheresa/go-hiring-challenge/infra/monitor"
 )
 
 func main() {

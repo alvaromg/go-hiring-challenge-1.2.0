@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
-	"github.com/mytheresa/go-hiring-challenge/lib/rest"
+	"github.com/mytheresa/go-hiring-challenge/infra/rest"
 	"github.com/shopspring/decimal"
 )
 

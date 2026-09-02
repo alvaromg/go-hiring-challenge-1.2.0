@@ -7,7 +7,7 @@ import (
 
 	"github.com/mytheresa/go-hiring-challenge/shared"
 
-	"github.com/mytheresa/go-hiring-challenge/lib/operation"
+	"github.com/mytheresa/go-hiring-challenge/infra/operation"
 )
 
 type JsonString json.RawMessage

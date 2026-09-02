@@ -11,8 +11,8 @@ import (
 	domainerrors "github.com/mytheresa/go-hiring-challenge/domain/errors"
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
 
-	libmodel "github.com/mytheresa/go-hiring-challenge/lib/model"
-	"github.com/mytheresa/go-hiring-challenge/lib/operation"
+	libmodel "github.com/mytheresa/go-hiring-challenge/infra/database"
+	"github.com/mytheresa/go-hiring-challenge/infra/operation"
 )
 
 var (

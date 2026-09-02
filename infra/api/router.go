@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/mytheresa/go-hiring-challenge/app/catalog"
-	"github.com/mytheresa/go-hiring-challenge/lib/rest"
+	"github.com/mytheresa/go-hiring-challenge/infra/rest"
 	"github.com/mytheresa/go-hiring-challenge/shared"
 )
 

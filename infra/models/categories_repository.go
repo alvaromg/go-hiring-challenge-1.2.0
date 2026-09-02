@@ -7,7 +7,7 @@ import (
 	domainerrors "github.com/mytheresa/go-hiring-challenge/domain/errors"
 	"github.com/mytheresa/go-hiring-challenge/domain/list"
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
-	libmodel "github.com/mytheresa/go-hiring-challenge/lib/model"
+	libmodel "github.com/mytheresa/go-hiring-challenge/infra/database"
 	"gorm.io/gorm"
 )
 

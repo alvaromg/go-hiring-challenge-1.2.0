@@ -8,7 +8,7 @@ import (
 
 	"github.com/mytheresa/go-hiring-challenge/domain/list"
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
-	"github.com/mytheresa/go-hiring-challenge/lib/operation"
+	"github.com/mytheresa/go-hiring-challenge/infra/operation"
 	"github.com/mytheresa/go-hiring-challenge/shared"
 )
 

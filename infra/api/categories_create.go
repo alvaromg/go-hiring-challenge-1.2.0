@@ -7,7 +7,7 @@ import (
 
 	catalogapp "github.com/mytheresa/go-hiring-challenge/app/catalog"
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
-	"github.com/mytheresa/go-hiring-challenge/lib/rest"
+	"github.com/mytheresa/go-hiring-challenge/infra/rest"
 )
 
 type createCategoriesRequest struct {
