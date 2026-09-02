@@ -22,14 +22,6 @@ type product struct {
 	Variants []variant       `json:"variants"`
 }
 
-type productsData struct {
-	Products []product `json:"products"`
-}
-
-func wrapProductsResponse(products []product) productsData {
-	return productsData{Products: products}
-}
-
 func encodeVariantResponse(v catalog.Variant) variant {
 	return variant{
 		Name:  v.Name,

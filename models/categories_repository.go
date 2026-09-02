@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
+	domainerrors "github.com/mytheresa/go-hiring-challenge/domain/errors"
 	"github.com/mytheresa/go-hiring-challenge/domain/list"
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
 	libmodel "github.com/mytheresa/go-hiring-challenge/lib/model"
@@ -51,4 +52,21 @@ func (r *CategoriesRepository) GetCategories(q *query.Query) (list.ListResponse[
 	listRes.AddItems(categoriesToDomain(categories)...)
 
 	return listRes, nil
+}
+
+// CreateCategories persists all given categories in a single transaction.
+func (r *CategoriesRepository) CreateCategories(categories []*catalog.Category) ([]*catalog.Category, error) {
+	dbCategories := categoriesFromDomain(categories)
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		return tx.Create(&dbCategories).Error
+	})
+	if err != nil {
+		if value, ok := libmodel.AsDuplicateKeyError(err); ok {
+			return nil, fmt.Errorf("%w: category with code %q already exists", domainerrors.ErrorDuplicatedResource, value)
+		}
+		return nil, fmt.Errorf("%w: error creating categories: %s", libmodel.ErrorPersistence, err)
+	}
+
+	return categoriesToDomain(dbCategories), nil
 }

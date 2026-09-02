@@ -96,6 +96,32 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Create categories",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"categories\": [\n        {\n            \"code\": \"CAT101\",\n            \"name\": \"A new category\"\n        },\n        {\n            \"code\": \"CAT102\",\n            \"name\": \"Another category\"\n        }\n    ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/categories",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "categories"
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "event": [

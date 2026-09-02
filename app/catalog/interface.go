@@ -13,4 +13,5 @@ type ProductsRepository interface {
 
 type CategoriesRepository interface {
 	GetCategories(q *query.Query) (list.ListResponse[*catalog.Category], error)
+	CreateCategories(categories []*catalog.Category) ([]*catalog.Category, error)
 }

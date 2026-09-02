@@ -29,3 +29,18 @@ func categoriesToDomain(dbCategories []category) []*catalog.Category {
 	}
 	return categories
 }
+
+func categoryFromDomain(c *catalog.Category) category {
+	return category{
+		Code: c.Code(),
+		Name: c.Name(),
+	}
+}
+
+func categoriesFromDomain(categories []*catalog.Category) []category {
+	dbCategories := make([]category, len(categories))
+	for i, c := range categories {
+		dbCategories[i] = categoryFromDomain(c)
+	}
+	return dbCategories
+}

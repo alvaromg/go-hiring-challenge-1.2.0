@@ -42,11 +42,16 @@ func HandleHTTPError(log shared.Logger, w http.ResponseWriter, r *http.Request, 
 }
 
 func errToHTTPCode(err error) int {
-	if errors.Is(err, ErrorBadRequest) || errors.Is(err, query.ErrorInvalidQuery) {
+	if errors.Is(err, ErrorBadRequest) ||
+		errors.Is(err, query.ErrorInvalidQuery) ||
+		errors.Is(err, domainerrors.ErrorDomainValidation) {
 		return http.StatusBadRequest
 	}
 	if errors.Is(err, domainerrors.ErrorNotFound) {
 		return http.StatusNotFound
+	}
+	if errors.Is(err, domainerrors.ErrorDuplicatedResource) {
+		return http.StatusConflict
 	}
 	return http.StatusInternalServerError
 }
