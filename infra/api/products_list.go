@@ -18,6 +18,7 @@ import (
 // @Param        pageSize   		query      int  	false  "Page size"
 // @Param        filter_price_lt   	query      string  	false  "Filter by price lower than"
 // @Param        filter_category_eq query      string  	false  "Filter by category"
+// @Param        sort		   		query      string  	false  "Sorting"
 // @Success      200  {object}  rest.Response[productsList]
 // @Failure      500  {object}  rest.ErrorResponse
 // @Failure      400  {object}  rest.ErrorResponse

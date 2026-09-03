@@ -52,6 +52,12 @@ const docTemplate = `{
                         "description": "Filter by category",
                         "name": "filter_category_eq",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sorting",
+                        "name": "sort",
+                        "in": "query"
                     }
                 ],
                 "responses": {

@@ -11,7 +11,7 @@ This repository contains a Go application for managing products and their prices
 
 2. **app/**: Contains the application logic.
 3. **sql/**: Contains a very simple database migration scripts setup.
-4. **models/**: Contains the data models and repositories used in the application.
+4. **infra/models/**: Contains the data models and repositories used in the application.
 5. `.env`: Environment variables file for configuration.
 
 ## Setup Code Repository

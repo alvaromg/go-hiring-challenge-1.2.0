@@ -36,6 +36,10 @@ func (q *Query) HasFilter(field string) bool {
 	return false
 }
 
+func (q *Query) HasAnySort() bool {
+	return len(q.sorts) > 0
+}
+
 func (q *Query) GetFilter(field string) *Filter {
 	for _, f := range q.filters {
 		if f.Field() == field {

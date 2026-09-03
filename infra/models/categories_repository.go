@@ -13,12 +13,14 @@ import (
 )
 
 type CategoriesRepository struct {
-	db *gorm.DB
+	db            *gorm.DB
+	fieldsMapping map[string]string
 }
 
 func NewCategoriesRepository(db *gorm.DB) *CategoriesRepository {
 	return &CategoriesRepository{
-		db: db,
+		db:            db,
+		fieldsMapping: map[string]string{},
 	}
 }
 
@@ -28,7 +30,8 @@ func (r *CategoriesRepository) GetCategories(ctx context.Context, q *query.Query
 	db := r.db.WithContext(ctx)
 
 	// strict query validation: only pagination is allowed, no filters or sorts
-	validator := query.NewValidator()
+	validator := query.NewValidator().
+		AllowSort("code")
 	if err := validator.Validate(q); err != nil {
 		return zero, err
 	}
@@ -43,6 +46,7 @@ func (r *CategoriesRepository) GetCategories(ctx context.Context, q *query.Query
 	}
 
 	// apply pagination to find categories in page
+	db = libmodel.ApplyQuerySorts(db, q, r.fieldsMapping)
 	db = libmodel.ApplyQueryPagination(db, q)
 
 	var categories []category

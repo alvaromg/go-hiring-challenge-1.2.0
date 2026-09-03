@@ -137,6 +137,10 @@ paths:
         in: query
         name: filter_category_eq
         type: string
+      - description: Sorting
+        in: query
+        name: sort
+        type: string
       produces:
       - application/json
       responses:

@@ -39,7 +39,8 @@ func (r *ProductsRepository) GetProducts(ctx context.Context, q *query.Query) (l
 	// strict query validation
 	validator := query.NewValidator().
 		AllowFilter(FieldCategory, []query.Operator{query.Eq}, query.ValidateString).
-		AllowFilter(FieldPrice, []query.Operator{query.Lt}, query.ValidatePrice)
+		AllowFilter(FieldPrice, []query.Operator{query.Lt}, query.ValidatePrice).
+		AllowSort("code", "price")
 	if err := validator.Validate(q); err != nil {
 		return zero, err
 	}
@@ -61,7 +62,7 @@ func (r *ProductsRepository) GetProducts(ctx context.Context, q *query.Query) (l
 	}
 
 	// build query to return just products ids
-	db = db.Distinct("products.id")
+	db = db.Distinct("products.id", "products.code", "products.price")
 	if q.HasFilter(FieldCategory) {
 		db = db.Joins("JOIN categories c ON c.id = products.category_id")
 	}
@@ -84,14 +85,24 @@ func (r *ProductsRepository) GetProducts(ctx context.Context, q *query.Query) (l
 	db = libmodel.ApplyQueryPagination(db, q)
 
 	// get products ids for requested page (filters + sort + pagination)
-	var ids []uint
-	if err = db.Model(&product{}).Find(&ids).Error; err != nil {
+	// note: the select list includes products.code (required by Postgres so
+	// DISTINCT queries can ORDER BY it), so we must scan into a struct that
+	// has both columns rather than a plain []uint.
+	var rows []product
+	if err = db.Model(&product{}).Find(&rows).Error; err != nil {
 		return zero, fmt.Errorf("%w: error finding products: %s", libmodel.ErrorPersistence, err)
+	}
+	ids := make([]uint, len(rows))
+	for i, row := range rows {
+		ids[i] = row.ID
 	}
 
 	// get full products for requested page, based on previous filtered, sortd and paginated ids
 	var products []product
-	if err := r.db.WithContext(ctx).Preload("Variants").Preload("Category").Where("products.id IN ?", ids).Find(&products).Error; err != nil {
+	db = r.db.WithContext(ctx)
+	db = libmodel.ApplyQuerySorts(db, q, r.fieldsMapping)
+
+	if err := db.WithContext(ctx).Preload("Variants").Preload("Category").Where("products.id IN ?", ids).Find(&products).Error; err != nil {
 		return zero, fmt.Errorf("%w: error retrieving products: %s", libmodel.ErrorPersistence, err)
 	}
 

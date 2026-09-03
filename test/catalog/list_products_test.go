@@ -105,6 +105,74 @@ func testListProducts(t *testing.T, router http.Handler) {
 
 	})
 
+	t.Run("list products sorted by code ascending (default)", func(t *testing.T) {
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog", nil)
+		require.Equal(t, http.StatusOK, rec.Code)
+
+		var out helper.ListResponseDTO[productsListDTO]
+		helper.DecodeBody(t, rec, &out)
+
+		var codes []string
+		for _, p := range out.Data.Products {
+			codes = append(codes, p.Code)
+		}
+		assert.Equal(t, []string{
+			"PROD001", "PROD002", "PROD003", "PROD004",
+			"PROD005", "PROD006", "PROD007", "PROD008",
+		}, codes)
+	})
+
+	t.Run("list products sorted by code descending", func(t *testing.T) {
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?sort=-code", nil)
+		require.Equal(t, http.StatusOK, rec.Code)
+
+		var out helper.ListResponseDTO[productsListDTO]
+		helper.DecodeBody(t, rec, &out)
+
+		var codes []string
+		for _, p := range out.Data.Products {
+			codes = append(codes, p.Code)
+		}
+		assert.Equal(t, []string{
+			"PROD008", "PROD007", "PROD006", "PROD005",
+			"PROD004", "PROD003", "PROD002", "PROD001",
+		}, codes)
+	})
+
+	t.Run("list products sorted by price ascending", func(t *testing.T) {
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?sort=price", nil)
+		require.Equal(t, http.StatusOK, rec.Code)
+
+		var out helper.ListResponseDTO[productsListDTO]
+		helper.DecodeBody(t, rec, &out)
+
+		var codes []string
+		for _, p := range out.Data.Products {
+			codes = append(codes, p.Code)
+		}
+		assert.Equal(t, []string{
+			"PROD006", "PROD003", "PROD008", "PROD001",
+			"PROD002", "PROD004", "PROD007", "PROD005",
+		}, codes)
+	})
+
+	t.Run("list products sorted by price descending", func(t *testing.T) {
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?sort=-price", nil)
+		require.Equal(t, http.StatusOK, rec.Code)
+
+		var out helper.ListResponseDTO[productsListDTO]
+		helper.DecodeBody(t, rec, &out)
+
+		var codes []string
+		for _, p := range out.Data.Products {
+			codes = append(codes, p.Code)
+		}
+		assert.Equal(t, []string{
+			"PROD005", "PROD007", "PROD004", "PROD002",
+			"PROD001", "PROD008", "PROD003", "PROD006",
+		}, codes)
+	})
+
 	t.Run("list products filtered by category that does not exist", func(t *testing.T) {
 		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?filter_category_eq=CAT999", nil)
 		require.Equal(t, http.StatusNotFound, rec.Code)

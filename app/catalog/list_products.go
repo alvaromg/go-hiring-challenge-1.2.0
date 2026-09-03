@@ -15,6 +15,11 @@ type GetProductsInput struct {
 func (app *App) ListProducts(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Product], error) {
 	var zero list.ListResponse[*catalog.Product]
 
+	if !q.HasAnySort() {
+		// if not sorting defined set default for code ascending
+		q.AddSort("code", false)
+	}
+
 	res, err := app.productsRepo.GetProducts(ctx, q)
 	if err != nil {
 		return zero, err
