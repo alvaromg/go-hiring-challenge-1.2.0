@@ -9,7 +9,7 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/mytheresa/go-hiring-challenge/app/database"
+	"github.com/mytheresa/go-hiring-challenge/infra/database"
 )
 
 func main() {
@@ -19,12 +19,23 @@ func main() {
 	}
 
 	// Initialize database connection
-	db, close := database.New(
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		os.Getenv("POSTGRES_DB"),
-		os.Getenv("POSTGRES_PORT"),
-	)
+	writeConfig := database.Config{
+		Host:     os.Getenv("POSTGRES_WRITE_HOST"),
+		Port:     os.Getenv("POSTGRES_WRITE_PORT"),
+		User:     os.Getenv("POSTGRES_WRITE_USER"),
+		Password: os.Getenv("POSTGRES_WRITE_PASSWORD"),
+		DBName:   os.Getenv("POSTGRES_WRITE_DB"),
+	}
+	readConfig := database.Config{
+		Host:     os.Getenv("POSTGRES_READ_HOST"),
+		Port:     os.Getenv("POSTGRES_READ_PORT"),
+		User:     os.Getenv("POSTGRES_READ_USER"),
+		Password: os.Getenv("POSTGRES_READ_PASSWORD"),
+		DBName:   os.Getenv("POSTGRES_READ_DB"),
+	}
+
+	db, close := database.New(writeConfig, readConfig, database.PoolConfigFromEnv(), os.Getenv("POSTGRES_LOG_LEVEL"), nil)
+	//nolint: errcheck
 	defer close()
 
 	dir := os.Getenv("POSTGRES_SQL_DIR")

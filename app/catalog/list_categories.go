@@ -1,0 +1,24 @@
+package catalog
+
+import (
+	"context"
+
+	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
+	"github.com/mytheresa/go-hiring-challenge/domain/list"
+	"github.com/mytheresa/go-hiring-challenge/domain/query"
+	"github.com/mytheresa/go-hiring-challenge/infra/field"
+)
+
+func (app *App) ListCategories(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Category], error) {
+	var zero list.ListResponse[*catalog.Category]
+
+	// set default sorting
+	q.AddSort(field.Code, false)
+
+	res, err := app.categoriesRepo.GetCategories(ctx, q)
+	if err != nil {
+		return zero, err
+	}
+
+	return res, nil
+}
