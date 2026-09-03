@@ -6,6 +6,8 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -33,7 +35,7 @@ func (c Config) dsn() string {
 
 // New opens a database connection that routes writes to write and reads to
 // read via gorm's dbresolver plugin.
-func New(write, read Config, pool PoolConfig, logLevel string) (db *gorm.DB, close func() error) {
+func New(write, read Config, pool PoolConfig, logLevel string, tracer trace.Tracer) (db *gorm.DB, close func() error) {
 	dbLogLevel, err := parseLogLevel(logLevel)
 	if err != nil {
 		log.Fatalf("failed to parse database log level: %s", err)
@@ -76,6 +78,13 @@ func New(write, read Config, pool PoolConfig, logLevel string) (db *gorm.DB, clo
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatalf("Failed to get database connection: %s", err)
+	}
+
+	if tracer == nil {
+		tracer = noop.NewTracerProvider().Tracer("database")
+	}
+	if err := db.Use(newTracingPlugin(tracer)); err != nil {
+		log.Fatalf("failed to register database tracing plugin: %s", err)
 	}
 
 	return db, sqlDB.Close

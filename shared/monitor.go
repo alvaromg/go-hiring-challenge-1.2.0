@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Monitor interface {
 	Logger() Logger
+	Tracer() trace.Tracer
 }
 
 type Logger interface {

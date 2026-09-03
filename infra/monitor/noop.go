@@ -6,6 +6,8 @@ import (
 
 	"github.com/mytheresa/go-hiring-challenge/shared"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 var _ shared.Monitor = (*noopMonitor)(nil)
@@ -15,14 +17,22 @@ var _ shared.Logger = (*noopLogger)(nil)
 // producing any output, so test runs stay quiet.
 type noopMonitor struct {
 	logger shared.Logger
+	tracer trace.Tracer
 }
 
 func NewNoopMonitor() *noopMonitor {
-	return &noopMonitor{logger: newNoopLogger()}
+	return &noopMonitor{
+		logger: newNoopLogger(),
+		tracer: noop.NewTracerProvider().Tracer("noop"),
+	}
 }
 
 func (m *noopMonitor) Logger() shared.Logger {
 	return m.logger
+}
+
+func (m *noopMonitor) Tracer() trace.Tracer {
+	return m.tracer
 }
 
 type noopLogger struct {

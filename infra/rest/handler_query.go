@@ -18,19 +18,27 @@ func NewListByQueryHandle[DO, RO, WD any](
 	dataWrapper func([]RO) WD,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, span := startHandlerSpan(monitor, r)
+		statusCode := http.StatusOK
+		var err error
+		defer func() { endHandlerSpan(span, statusCode, err) }()
+
 		q, err := DecodeQueryFromRequest(r)
 		if err != nil {
+			statusCode = errToHTTPCode(err)
 			HandleHTTPError(monitor.Logger(), w, r, err)
 			return
 		}
 
-		out, err := appHandler(r.Context(), q)
+		var out list.ListResponse[DO]
+		out, err = appHandler(ctx, q)
 		if err != nil {
+			statusCode = errToHTTPCode(err)
 			HandleHTTPError(monitor.Logger(), w, r, err)
 			return
 		}
 
 		w.Header().Add("Content-Type", "application/json")
-		EncodeListResponse(monitor.Logger(), r.Context(), itemEncoder, dataWrapper, out, q, w, r)
+		EncodeListResponse(monitor.Logger(), ctx, itemEncoder, dataWrapper, out, q, w, r)
 	}
 }

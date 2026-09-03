@@ -30,6 +30,7 @@ import (
 // @BasePath /
 // Defaults used when the corresponding env var is unset.
 const (
+	serviceName              = "go-hiring-challenge"
 	defaultReadHeaderTimeout = 5 * time.Second
 	defaultIdleTimeout       = 60 * time.Second
 )
@@ -50,14 +51,6 @@ func envDuration(key string, def time.Duration) time.Duration {
 
 func main() {
 
-	// create monitor
-	logger, err := monitor.NewLogger("INFO", false)
-	if err != nil {
-		log.Fatalf("Error creating logger: %s", err)
-	}
-
-	monitor := monitor.NewMonitor(logger)
-
 	// Load environment variables from .env file
 	if err := godotenv.Load(".env"); err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
@@ -76,6 +69,26 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	// Bootstrap OpenTelemetry: traces and logs are exported via OTLP/HTTP to
+	// the grafana-lgtm container started by docker-compose.
+	tracer, loggerProvider, shutdownOTel, err := monitor.SetupOTelSDK(ctx, serviceName, os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
+	if err != nil {
+		log.Fatalf("Error setting up OpenTelemetry: %s", err)
+	}
+	defer func() {
+		if err := shutdownOTel(context.Background()); err != nil {
+			log.Printf("Error shutting down OpenTelemetry: %s", err)
+		}
+	}()
+
+	// create monitor
+	logger, err := monitor.NewLogger("INFO", false, loggerProvider)
+	if err != nil {
+		log.Fatalf("Error creating logger: %s", err)
+	}
+
+	monitor := monitor.NewMonitor(logger, tracer)
+
 	// Initialize database connection
 	writeConfig := database.Config{
 		Host:     os.Getenv("POSTGRES_WRITE_HOST"),
@@ -92,7 +105,7 @@ func main() {
 		DBName:   os.Getenv("POSTGRES_READ_DB"),
 	}
 
-	db, close := database.New(writeConfig, readConfig, database.PoolConfigFromEnv(), os.Getenv("POSTGRES_LOG_LEVEL"))
+	db, close := database.New(writeConfig, readConfig, database.PoolConfigFromEnv(), os.Getenv("POSTGRES_LOG_LEVEL"), tracer)
 	//nolint: errcheck
 	defer close()
 

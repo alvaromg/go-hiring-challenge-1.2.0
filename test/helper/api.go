@@ -55,7 +55,7 @@ func BuildApi() (http.Handler, func()) {
 	}
 
 	// The test container is a single instance, so reads and writes share the same config.
-	db, closeDB := database.New(config, config, database.PoolConfig{}, "error")
+	db, closeDB := database.New(config, config, database.PoolConfig{}, "error", nil)
 
 	router := newRouter(db)
 

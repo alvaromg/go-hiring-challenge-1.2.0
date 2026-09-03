@@ -34,7 +34,7 @@ func main() {
 		DBName:   os.Getenv("POSTGRES_READ_DB"),
 	}
 
-	db, close := database.New(writeConfig, readConfig, database.PoolConfigFromEnv(), os.Getenv("POSTGRES_LOG_LEVEL"))
+	db, close := database.New(writeConfig, readConfig, database.PoolConfigFromEnv(), os.Getenv("POSTGRES_LOG_LEVEL"), nil)
 	//nolint: errcheck
 	defer close()
 
