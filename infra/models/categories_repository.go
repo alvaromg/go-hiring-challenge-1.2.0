@@ -75,8 +75,8 @@ func (r *CategoriesRepository) CreateCategories(ctx context.Context, categories 
 		return tx.Create(&dbCategories).Error
 	})
 	if err != nil {
-		if value, ok := libmodel.AsDuplicateKeyError(err); ok {
-			return nil, fmt.Errorf("%w: category with code %q already exists", domainerrors.ErrorDuplicatedResource, value)
+		if field, value, ok := libmodel.AsDuplicateKeyError(err); ok {
+			return nil, fmt.Errorf("%w: category with %s %q already exists", domainerrors.ErrorDuplicatedResource, field, value)
 		}
 		return nil, fmt.Errorf("%w: error creating categories: %s", libmodel.ErrorPersistence, err)
 	}

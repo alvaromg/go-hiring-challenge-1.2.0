@@ -10,8 +10,11 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE UNIQUE INDEX IF NOT EXISTS categories_code_idx ON categories (code);
 
+-- Ensure no duplicated category names
+
+CREATE UNIQUE INDEX IF NOT EXISTS categories_name_idx ON categories (name);
+
 -- Categories/products relationship as many to one (a product belongs to at most one category)
 
 ALTER TABLE products ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL;
-
 CREATE INDEX IF NOT EXISTS products_category_id_idx ON products (category_id);

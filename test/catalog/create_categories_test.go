@@ -64,6 +64,21 @@ func testCreateCategories(t *testing.T, router http.Handler) {
 		require.Equal(t, http.StatusConflict, rec.Code)
 	})
 
+	t.Run("create category with duplicate name", func(t *testing.T) {
+		body := map[string]any{
+			"categories": []map[string]string{
+				{"code": "CAT903", "name": "test category 1"},
+			},
+		}
+
+		rec := helper.DoRequest(t, router, http.MethodPost, "/v1/categories", body)
+		require.Equal(t, http.StatusConflict, rec.Code)
+
+		// assert no category was persisted under the conflicting code
+
+		assertCategoriesDontExist(t, router, []string{"CAT903"})
+	})
+
 	t.Run("create categories only applies as a unit", func(t *testing.T) {
 		body := map[string]any{
 			"categories": []map[string]string{
