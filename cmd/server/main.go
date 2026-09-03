@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/mytheresa/go-hiring-challenge/app/catalog"
@@ -25,10 +26,27 @@ import (
 // @version 1.0
 // @description This is API server for Go Hiring Challenge
 // @termsOfService http://swagger.io/terms/
-
 // @host localhost:8484
 // @BasePath /
-const serviceName = "go-hiring-challenge"
+// Defaults used when the corresponding env var is unset.
+const (
+	defaultReadHeaderTimeout = 5 * time.Second
+	defaultIdleTimeout       = 60 * time.Second
+)
+
+func envDuration(key string, def time.Duration) time.Duration {
+	v := os.Getenv(key)
+	if v == "" {
+		return def
+	}
+
+	d, err := time.ParseDuration(v)
+	if err != nil {
+		log.Fatalf("Unable to parse %s config value: %s", key, err)
+	}
+
+	return d
+}
 
 func main() {
 
@@ -49,6 +67,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to parse START_DOC_SERVER config value: %s", err)
 	}
+
+	handlerTimeout := envDuration("HTTP_HANDLER_TIMEOUT", api.DefaultHandlerTimeout)
+	readHeaderTimeout := envDuration("HTTP_READ_HEADER_TIMEOUT", defaultReadHeaderTimeout)
+	idleTimeout := envDuration("HTTP_IDLE_TIMEOUT", defaultIdleTimeout)
 
 	// signal handling for graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -83,12 +105,14 @@ func main() {
 
 	// Set up routing
 	corsAllowedOrigins := rest.ParseAllowedOrigins(os.Getenv("CORS_ALLOWED_ORIGINS"))
-	router := api.NewApiRouter(monitor, catalogApp, corsAllowedOrigins)
+	router := api.NewApiRouter(monitor, catalogApp, corsAllowedOrigins, handlerTimeout)
 
 	// Set up the API server
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("localhost:%s", os.Getenv("HTTP_PORT")),
-		Handler: router,
+		Addr:              fmt.Sprintf("localhost:%s", os.Getenv("HTTP_PORT")),
+		Handler:           router,
+		ReadHeaderTimeout: readHeaderTimeout,
+		IdleTimeout:       idleTimeout,
 	}
 
 	// Start API server
@@ -108,8 +132,10 @@ func main() {
 		httpSwagger.URL("http://localhost:1323/swagger/doc.json"),
 	))
 	docSrv := &http.Server{
-		Addr:    fmt.Sprintf("localhost:%s", "1323"),
-		Handler: docRouter,
+		Addr:              fmt.Sprintf("localhost:%s", "1323"),
+		Handler:           docRouter,
+		ReadHeaderTimeout: readHeaderTimeout,
+		IdleTimeout:       idleTimeout,
 	}
 
 	if runDocServer {

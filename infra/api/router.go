@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/mytheresa/go-hiring-challenge/app/catalog"
 	"github.com/mytheresa/go-hiring-challenge/infra/rest"
@@ -10,7 +11,10 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
-func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App, corsAllowedOrigins []string) http.Handler {
+// DefaultHandlerTimeout is used when no timeout is configured (e.g. HTTP_HANDLER_TIMEOUT is unset).
+const DefaultHandlerTimeout = 10 * time.Second
+
+func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App, corsAllowedOrigins []string, handlerTimeout time.Duration) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /v1/catalog", productsListController(monitor, catalogApp))
@@ -19,7 +23,12 @@ func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App, corsAllowedOr
 	mux.HandleFunc("POST /v1/categories", createCategoriesController(monitor, catalogApp))
 	mux.HandleFunc("/", rest.DefaultNotFound(monitor.Logger()))
 
-	return chainMiddlewares(mux, rest.OperationIdMiddleware, rest.NewLoggingMiddleware(monitor.Logger()), rest.NewCorsMiddleware(corsAllowedOrigins...))
+	return chainMiddlewares(mux,
+		rest.OperationIdMiddleware,
+		rest.NewLoggingMiddleware(monitor.Logger()),
+		rest.NewTimeoutMiddleware(handlerTimeout),
+		rest.NewCorsMiddleware(corsAllowedOrigins...),
+	)
 }
 
 // Chain applies middlewares in order, so the first one runs first

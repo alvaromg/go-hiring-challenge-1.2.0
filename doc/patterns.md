@@ -11,3 +11,4 @@ Facade — `Monitor` wraps `Logger` behind a small unified interface (infra/moni
 Value Object — immutable domain identifiers/amounts with parsing and invariants, e.g. `ProductCode`, `CategoryCode`, `Price` (domain/catalog/product_code.go, domain/price/price.go)
 Data Transfer Object / Mapper — REST-facing structs (`product`, `variant`, `category`) mapped to/from domain types via `encode*Response`/`*ToDomain` functions (infra/api/product_detail.go, infra/models/products_repository.go)
 Template Method (via generics + injected functions) — `NewHandler`/`NewListByQueryHandle` define a fixed decode → call → encode → write pipeline parameterized by request decoder, app handler and response encoder (infra/rest/handler.go, infra/rest/handler_query.go)
+DB reads/writes split

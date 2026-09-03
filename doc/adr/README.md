@@ -16,3 +16,4 @@ This folder tracks the architecture decisions made throughout this project: the 
 - [012 - Testing strategy](012-testing-strategy.md)
 - [013 - API doc with swaggo](013-api-doc-with-swaggo.md)
 - [014 - Database read/write split](014-database-read-write-split.md)
+- [015 - HTTP server timeouts](015-http-server-timeouts.md)
