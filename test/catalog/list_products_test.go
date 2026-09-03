@@ -11,7 +11,7 @@ import (
 
 func testListProducts(t *testing.T, router http.Handler) {
 	t.Run("list products", func(t *testing.T) {
-		rec := helper.DoRequest(t, router, http.MethodGet, "/catalog", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		var out helper.ListResponseDTO[productsListDTO]
@@ -25,7 +25,7 @@ func testListProducts(t *testing.T, router http.Handler) {
 	})
 
 	t.Run("list products filtered by price less than", func(t *testing.T) {
-		rec := helper.DoRequest(t, router, http.MethodGet, "/catalog?filter_price_lt=10", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?filter_price_lt=10", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		var out helper.ListResponseDTO[productsListDTO]
@@ -39,7 +39,7 @@ func testListProducts(t *testing.T, router http.Handler) {
 	})
 
 	t.Run("list products filtered by category", func(t *testing.T) {
-		rec := helper.DoRequest(t, router, http.MethodGet, "/catalog?filter_category_eq=CAT001", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?filter_category_eq=CAT001", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		var out helper.ListResponseDTO[productsListDTO]
@@ -60,7 +60,7 @@ func testListProducts(t *testing.T, router http.Handler) {
 		var out helper.ListResponseDTO[productsListDTO]
 
 		// page 1
-		rec := helper.DoRequest(t, router, http.MethodGet, "/catalog?pageSize=3&page=1", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?pageSize=3&page=1", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		helper.DecodeBody(t, rec, &out)
@@ -71,7 +71,7 @@ func testListProducts(t *testing.T, router http.Handler) {
 		assert.Len(t, out.Data.Products, 3)
 
 		// page 2
-		rec = helper.DoRequest(t, router, http.MethodGet, "/catalog?pageSize=3&page=2", nil)
+		rec = helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?pageSize=3&page=2", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		helper.DecodeBody(t, rec, &out)
@@ -82,7 +82,7 @@ func testListProducts(t *testing.T, router http.Handler) {
 		assert.Len(t, out.Data.Products, 3)
 
 		// page 3
-		rec = helper.DoRequest(t, router, http.MethodGet, "/catalog?pageSize=3&page=3", nil)
+		rec = helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?pageSize=3&page=3", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		helper.DecodeBody(t, rec, &out)
@@ -93,7 +93,7 @@ func testListProducts(t *testing.T, router http.Handler) {
 		assert.Len(t, out.Data.Products, 2)
 
 		// page 4
-		rec = helper.DoRequest(t, router, http.MethodGet, "/catalog?pageSize=3&page=4", nil)
+		rec = helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?pageSize=3&page=4", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		helper.DecodeBody(t, rec, &out)
@@ -106,7 +106,7 @@ func testListProducts(t *testing.T, router http.Handler) {
 	})
 
 	t.Run("list products filtered by category that does not exist", func(t *testing.T) {
-		rec := helper.DoRequest(t, router, http.MethodGet, "/catalog?filter_category_eq=CAT999", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog?filter_category_eq=CAT999", nil)
 		require.Equal(t, http.StatusNotFound, rec.Code)
 
 		var out helper.ErrorResponseDTO

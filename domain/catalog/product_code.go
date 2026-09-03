@@ -10,7 +10,7 @@ import (
 
 const (
 	productCodePrefix   = "PROD"
-	maxProductCodeValue = 999
+	maxProductCodeValue = 1000000000
 )
 
 // ProductCode is a value object representing a product identifier, formatted as "PROD###".

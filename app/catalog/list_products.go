@@ -15,7 +15,7 @@ type GetProductsInput struct {
 func (app *App) ListProducts(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Product], error) {
 	var zero list.ListResponse[*catalog.Product]
 
-	res, err := app.productsRepo.GetAllProducts(q)
+	res, err := app.productsRepo.GetProducts(q)
 	if err != nil {
 		return zero, err
 	}

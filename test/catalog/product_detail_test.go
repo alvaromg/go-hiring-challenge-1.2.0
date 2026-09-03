@@ -11,7 +11,7 @@ import (
 
 func testProductDetail(t *testing.T, router http.Handler) {
 	t.Run("product detail", func(t *testing.T) {
-		rec := helper.DoRequest(t, router, http.MethodGet, "/catalog/PROD001", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog/PROD001", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		var out helper.ResponseDTO[productDTO]
@@ -42,7 +42,7 @@ func testProductDetail(t *testing.T, router http.Handler) {
 	})
 
 	t.Run("product detail not found", func(t *testing.T) {
-		rec := helper.DoRequest(t, router, http.MethodGet, "/catalog/PROD999", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog/PROD999", nil)
 		require.Equal(t, http.StatusNotFound, rec.Code)
 
 		var out helper.ErrorResponseDTO

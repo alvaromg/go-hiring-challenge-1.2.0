@@ -19,7 +19,7 @@ func testCreateCategories(t *testing.T, router http.Handler) {
 			},
 		}
 
-		rec := helper.DoRequest(t, router, http.MethodPost, "/categories", body)
+		rec := helper.DoRequest(t, router, http.MethodPost, "/v1/categories", body)
 		require.Equal(t, http.StatusCreated, rec.Code)
 
 		// assert response
@@ -49,7 +49,7 @@ func testCreateCategories(t *testing.T, router http.Handler) {
 			},
 		}
 
-		rec := helper.DoRequest(t, router, http.MethodPost, "/categories", body)
+		rec := helper.DoRequest(t, router, http.MethodPost, "/v1/categories", body)
 		require.Equal(t, http.StatusBadRequest, rec.Code)
 	})
 
@@ -60,7 +60,7 @@ func testCreateCategories(t *testing.T, router http.Handler) {
 			},
 		}
 
-		rec := helper.DoRequest(t, router, http.MethodPost, "/categories", body)
+		rec := helper.DoRequest(t, router, http.MethodPost, "/v1/categories", body)
 		require.Equal(t, http.StatusConflict, rec.Code)
 	})
 
@@ -72,7 +72,7 @@ func testCreateCategories(t *testing.T, router http.Handler) {
 			},
 		}
 
-		rec := helper.DoRequest(t, router, http.MethodPost, "/categories", body)
+		rec := helper.DoRequest(t, router, http.MethodPost, "/v1/categories", body)
 		require.Equal(t, http.StatusConflict, rec.Code)
 
 		// assert no categories are persisted
@@ -82,7 +82,7 @@ func testCreateCategories(t *testing.T, router http.Handler) {
 }
 
 func assertCategoriesExist(t *testing.T, router http.Handler, codes []string) {
-	rec := helper.DoRequest(t, router, http.MethodGet, "/categories", nil)
+	rec := helper.DoRequest(t, router, http.MethodGet, "/v1/categories", nil)
 	require.Equal(t, http.StatusOK, rec.Code)
 
 	var out helper.ListResponseDTO[categoriesListDTO]
@@ -99,7 +99,7 @@ func assertCategoriesExist(t *testing.T, router http.Handler, codes []string) {
 }
 
 func assertCategoriesDontExist(t *testing.T, router http.Handler, codes []string) {
-	rec := helper.DoRequest(t, router, http.MethodGet, "/categories", nil)
+	rec := helper.DoRequest(t, router, http.MethodGet, "/v1/categories", nil)
 	require.Equal(t, http.StatusOK, rec.Code)
 
 	var out helper.ListResponseDTO[categoriesListDTO]

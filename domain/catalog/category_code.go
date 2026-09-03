@@ -10,7 +10,7 @@ import (
 
 const (
 	categoryCodePrefix   = "CAT"
-	maxCategoryCodeValue = 999
+	maxCategoryCodeValue = 1000000000
 )
 
 // CategoryCode is a value object representing a category identifier, formatted as "CAT###".

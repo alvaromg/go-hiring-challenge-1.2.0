@@ -7,7 +7,7 @@ import (
 )
 
 type ProductsRepository interface {
-	GetAllProducts(q *query.Query) (list.ListResponse[*catalog.Product], error)
+	GetProducts(q *query.Query) (list.ListResponse[*catalog.Product], error)
 	GetProductByCode(code catalog.ProductCode) (*catalog.Product, error)
 }
 

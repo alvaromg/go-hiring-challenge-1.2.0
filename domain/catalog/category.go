@@ -7,7 +7,7 @@ import (
 	domainerrors "github.com/mytheresa/go-hiring-challenge/domain/errors"
 )
 
-const maxCategoryNameLength = 32
+const maxCategoryNameLength = 64
 
 type Category struct {
 	code CategoryCode

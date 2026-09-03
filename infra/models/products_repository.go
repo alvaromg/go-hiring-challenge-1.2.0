@@ -30,7 +30,7 @@ func NewProductsRepository(db *gorm.DB) *ProductsRepository {
 		},
 	}
 }
-func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*catalog.Product], error) {
+func (r *ProductsRepository) GetProducts(q *query.Query) (list.ListResponse[*catalog.Product], error) {
 	var zero list.ListResponse[*catalog.Product]
 
 	// strict query validation
@@ -57,7 +57,7 @@ func (r *ProductsRepository) GetAllProducts(q *query.Query) (list.ListResponse[*
 		}
 	}
 
-	// build query to return just ids
+	// build query to return just products ids
 	db := r.db.Distinct("products.id")
 	if q.HasFilter(FieldCategory) {
 		db = db.Joins("JOIN categories c ON c.id = products.category_id")

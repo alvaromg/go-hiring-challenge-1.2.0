@@ -12,11 +12,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/catalog",
+          "raw": "{{baseUrl}}/v1/catalog",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "v1",
             "catalog"
           ],
           "query": [
@@ -52,11 +53,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/catalog/:code",
+          "raw": "{{baseUrl}}/v1/catalog/:code",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "v1",
             "catalog",
             ":code"
           ],
@@ -76,11 +78,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/categories",
+          "raw": "{{baseUrl}}/v1/categories",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "v1",
             "categories"
           ],
           "query": [
@@ -114,11 +117,12 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/categories",
+          "raw": "{{baseUrl}}/v1/categories",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "v1",
             "categories"
           ]
         }

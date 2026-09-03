@@ -11,7 +11,7 @@ import (
 
 func testListCategories(t *testing.T, router http.Handler) {
 	t.Run("list categories", func(t *testing.T) {
-		rec := helper.DoRequest(t, router, http.MethodGet, "/categories", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/categories", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		var out helper.ListResponseDTO[categoriesListDTO]
@@ -27,7 +27,7 @@ func testListCategories(t *testing.T, router http.Handler) {
 		var out helper.ListResponseDTO[categoriesListDTO]
 
 		// page 1
-		rec := helper.DoRequest(t, router, http.MethodGet, "/categories?pageSize=2&page=1", nil)
+		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/categories?pageSize=2&page=1", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		helper.DecodeBody(t, rec, &out)
@@ -38,7 +38,7 @@ func testListCategories(t *testing.T, router http.Handler) {
 		assert.Len(t, out.Data.Categories, 2)
 
 		// page 2
-		rec = helper.DoRequest(t, router, http.MethodGet, "/categories?pageSize=2&page=2", nil)
+		rec = helper.DoRequest(t, router, http.MethodGet, "/v1/categories?pageSize=2&page=2", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		helper.DecodeBody(t, rec, &out)
@@ -49,7 +49,7 @@ func testListCategories(t *testing.T, router http.Handler) {
 		assert.Len(t, out.Data.Categories, 1)
 
 		// page 3
-		rec = helper.DoRequest(t, router, http.MethodGet, "/categories?pageSize=2&page=3", nil)
+		rec = helper.DoRequest(t, router, http.MethodGet, "/v1/categories?pageSize=2&page=3", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
 		helper.DecodeBody(t, rec, &out)

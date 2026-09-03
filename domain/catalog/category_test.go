@@ -28,10 +28,10 @@ func TestCategory(t *testing.T) {
 	})
 
 	t.Run("new category with name too long", func(t *testing.T) {
-		_, err := catalog.NewCategory(code, "123456789012345678901234567890123")
+		_, err := catalog.NewCategory(code, "12345678901234567890123456789012345678901234567890123456789012345")
 		assert.Error(t, err)
 		assert.ErrorIs(t, err, domainerrors.ErrorDomainValidation)
-		assert.ErrorContains(t, err, "category name must not be longer than 32 characters")
+		assert.ErrorContains(t, err, "category name must not be longer than 64 characters")
 	})
 
 	t.Run("restore category", func(t *testing.T) {
