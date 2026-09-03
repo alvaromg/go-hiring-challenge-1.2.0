@@ -6,6 +6,7 @@ import (
 
 	"github.com/mytheresa/go-hiring-challenge/app/catalog"
 	domainCatalog "github.com/mytheresa/go-hiring-challenge/domain/catalog"
+	"github.com/mytheresa/go-hiring-challenge/infra/field"
 	"github.com/mytheresa/go-hiring-challenge/infra/rest"
 	"github.com/mytheresa/go-hiring-challenge/shared"
 )
@@ -69,7 +70,7 @@ func encodeProductResponse(p *domainCatalog.Product) product {
 func decodeProductCodeFromRequest(r *http.Request) (domainCatalog.ProductCode, error) {
 	var zero domainCatalog.ProductCode
 
-	codeStr := r.PathValue("code")
+	codeStr := r.PathValue(field.Code)
 	if codeStr == "" {
 		return zero, fmt.Errorf("%w: missing product code", rest.ErrorBadRequest)
 	}

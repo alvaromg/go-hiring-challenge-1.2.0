@@ -10,12 +10,8 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/domain/list"
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
 	libmodel "github.com/mytheresa/go-hiring-challenge/infra/database"
+	"github.com/mytheresa/go-hiring-challenge/infra/field"
 	"gorm.io/gorm"
-)
-
-const (
-	FieldPrice    = "price"
-	FieldCategory = "category"
 )
 
 type ProductsRepository struct {
@@ -27,7 +23,7 @@ func NewProductsRepository(db *gorm.DB) *ProductsRepository {
 	return &ProductsRepository{
 		db: db,
 		fieldsMapping: map[string]string{
-			FieldCategory: "c.code",
+			field.Category: "c.code",
 		},
 	}
 }
@@ -38,16 +34,16 @@ func (r *ProductsRepository) GetProducts(ctx context.Context, q *query.Query) (l
 
 	// strict query validation
 	validator := query.NewValidator().
-		AllowFilter(FieldCategory, []query.Operator{query.Eq}, query.ValidateString).
-		AllowFilter(FieldPrice, []query.Operator{query.Lt}, query.ValidatePrice).
-		AllowSort("code", "price")
+		AllowFilter(field.Category, []query.Operator{query.Eq}, query.ValidateString).
+		AllowFilter(field.Price, []query.Operator{query.Lt}, query.ValidatePrice).
+		AllowSort(field.Code, field.Price)
 	if err := validator.Validate(q); err != nil {
 		return zero, err
 	}
 
 	// ensure the category filter, if present, refers to an existing category
-	if q.HasFilter(FieldCategory) {
-		categoryCode, ok := q.GetFilter(FieldCategory).Value().(string)
+	if q.HasFilter(field.Category) {
+		categoryCode, ok := q.GetFilter(field.Category).Value().(string)
 		if !ok {
 			return zero, fmt.Errorf("%w: error parsing category field", libmodel.ErrorPersistence)
 		}
@@ -63,7 +59,7 @@ func (r *ProductsRepository) GetProducts(ctx context.Context, q *query.Query) (l
 
 	// build query to return just products ids
 	db = db.Distinct("products.id", "products.code", "products.price")
-	if q.HasFilter(FieldCategory) {
+	if q.HasFilter(field.Category) {
 		db = db.Joins("JOIN categories c ON c.id = products.category_id")
 	}
 

@@ -9,6 +9,7 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/domain/list"
 	"github.com/mytheresa/go-hiring-challenge/domain/query"
 	libmodel "github.com/mytheresa/go-hiring-challenge/infra/database"
+	"github.com/mytheresa/go-hiring-challenge/infra/field"
 	"gorm.io/gorm"
 )
 
@@ -31,7 +32,7 @@ func (r *CategoriesRepository) GetCategories(ctx context.Context, q *query.Query
 
 	// strict query validation: only pagination is allowed, no filters or sorts
 	validator := query.NewValidator().
-		AllowSort("code")
+		AllowSort(field.Code)
 	if err := validator.Validate(q); err != nil {
 		return zero, err
 	}
