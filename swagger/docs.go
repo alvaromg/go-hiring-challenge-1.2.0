@@ -107,7 +107,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest.Response-api_product"
+                            "$ref": "#/definitions/rest.Response-api_productDetail"
                         }
                     },
                     "400": {
@@ -277,6 +277,14 @@ const docTemplate = `{
                 }
             }
         },
+        "api.productDetail": {
+            "type": "object",
+            "properties": {
+                "product": {
+                    "$ref": "#/definitions/api.product"
+                }
+            }
+        },
         "api.productsList": {
             "type": "object",
             "properties": {
@@ -363,11 +371,11 @@ const docTemplate = `{
                 }
             }
         },
-        "rest.Response-api_product": {
+        "rest.Response-api_productDetail": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/api.product"
+                    "$ref": "#/definitions/api.productDetail"
                 },
                 "metadata": {
                     "$ref": "#/definitions/rest.ResponseMetadata"

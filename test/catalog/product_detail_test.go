@@ -14,28 +14,28 @@ func testProductDetail(t *testing.T, router http.Handler) {
 		rec := helper.DoRequest(t, router, http.MethodGet, "/v1/catalog/PROD001", nil)
 		require.Equal(t, http.StatusOK, rec.Code)
 
-		var out helper.ResponseDTO[productDTO]
+		var out helper.ResponseDTO[productDetailDTO]
 		helper.DecodeBody(t, rec, &out)
 
-		assert.Equal(t, "PROD001", out.Data.Code)
-		assert.Equal(t, "10.99", out.Data.Price)
-		assert.NotNil(t, out.Data.Category)
-		assert.Equal(t, "CAT001", out.Data.Category.Code)
-		assert.Equal(t, "Clothing", out.Data.Category.Name)
+		assert.Equal(t, "PROD001", out.Data.Product.Code)
+		assert.Equal(t, "10.99", out.Data.Product.Price)
+		assert.NotNil(t, out.Data.Product.Category)
+		assert.Equal(t, "CAT001", out.Data.Product.Category.Code)
+		assert.Equal(t, "Clothing", out.Data.Product.Category.Name)
 
-		assert.Len(t, out.Data.Variants, 3)
+		assert.Len(t, out.Data.Product.Variants, 3)
 
-		variant := out.Data.Variants[0]
+		variant := out.Data.Product.Variants[0]
 		assert.Equal(t, "Variant A", variant.Name)
 		assert.Equal(t, "SKU001A", variant.SKU)
 		assert.Equal(t, "11.99", *variant.Price)
 
-		variant = out.Data.Variants[1]
+		variant = out.Data.Product.Variants[1]
 		assert.Equal(t, "Variant B", variant.Name)
 		assert.Equal(t, "SKU001B", variant.SKU)
 		assert.Equal(t, "10.99", *variant.Price)
 
-		variant = out.Data.Variants[2]
+		variant = out.Data.Product.Variants[2]
 		assert.Equal(t, "Variant C", variant.Name)
 		assert.Equal(t, "SKU001C", variant.SKU)
 		assert.Equal(t, "10.99", *variant.Price)

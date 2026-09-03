@@ -55,5 +55,5 @@ Once the app and its Docker services are running (`make docker-up`, `make run`):
 | Service      | URL                     |
 | ------------ | ----------------------- |
 | API          | http://localhost:8484   |
-| Swagger docs | http://localhost:1323   |
+| Swagger docs | http://localhost:1323/swagger/index.html   |
 | Grafana      | http://localhost:3000   |

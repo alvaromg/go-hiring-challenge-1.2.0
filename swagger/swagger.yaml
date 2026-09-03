@@ -34,6 +34,11 @@ definitions:
           $ref: '#/definitions/api.variant'
         type: array
     type: object
+  api.productDetail:
+    properties:
+      product:
+        $ref: '#/definitions/api.product'
+    type: object
   api.productsList:
     properties:
       products:
@@ -89,10 +94,10 @@ definitions:
       metadata:
         $ref: '#/definitions/rest.ResponseMetadata'
     type: object
-  rest.Response-api_product:
+  rest.Response-api_productDetail:
     properties:
       data:
-        $ref: '#/definitions/api.product'
+        $ref: '#/definitions/api.productDetail'
       metadata:
         $ref: '#/definitions/rest.ResponseMetadata'
     type: object
@@ -175,7 +180,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest.Response-api_product'
+            $ref: '#/definitions/rest.Response-api_productDetail'
         "400":
           description: Bad Request
           schema:

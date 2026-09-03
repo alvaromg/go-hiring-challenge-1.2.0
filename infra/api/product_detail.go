@@ -18,12 +18,16 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        code   path      string  true  "Product code"
-// @Success      200  {object}  rest.Response[product]
+// @Success      200  {object}  rest.Response[productDetail]
 // @Failure      500  {object}  rest.ErrorResponse
 // @Failure      400  {object}  rest.ErrorResponse
 // @Failure      404  {object}  rest.ErrorResponse
 func productsDetailController(monitor shared.Monitor, app *catalog.App) http.HandlerFunc {
 	return rest.NewHandler(monitor, app.ProductDetail, decodeProductCodeFromRequest, encodeProductDetailResponse, http.StatusOK)
+}
+
+type productDetail struct {
+	Product product `json:"product"`
 }
 
 type variant struct {
@@ -83,6 +87,6 @@ func decodeProductCodeFromRequest(r *http.Request) (domainCatalog.ProductCode, e
 	return productCode, nil
 }
 
-func encodeProductDetailResponse(p *domainCatalog.Product) (product, error) {
-	return encodeProductResponse(p), nil
+func encodeProductDetailResponse(p *domainCatalog.Product) (productDetail, error) {
+	return productDetail{Product: encodeProductResponse(p)}, nil
 }

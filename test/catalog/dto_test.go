@@ -18,6 +18,10 @@ type productDTO struct {
 	Variants []variantDTO `json:"variants"`
 }
 
+type productDetailDTO struct {
+	Product productDTO `json:"product"`
+}
+
 type productsListDTO struct {
 	Products []productDTO `json:"products"`
 }
