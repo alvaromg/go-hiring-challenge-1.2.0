@@ -106,5 +106,5 @@ func newRouter(db *gorm.DB) http.Handler {
 	noopMonitor := monitor.NewNoopMonitor()
 	catalogApp := catalogapp.NewCatalogApp(noopMonitor.Logger(), productsRepo, categoriesRepo)
 
-	return api.NewApiRouter(noopMonitor, catalogApp)
+	return api.NewApiRouter(noopMonitor, catalogApp, []string{"http://localhost:1323"})
 }

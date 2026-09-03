@@ -16,6 +16,7 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/infra/database"
 	"github.com/mytheresa/go-hiring-challenge/infra/models"
 	"github.com/mytheresa/go-hiring-challenge/infra/monitor"
+	"github.com/mytheresa/go-hiring-challenge/infra/rest"
 	_ "github.com/mytheresa/go-hiring-challenge/swagger"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
@@ -81,7 +82,8 @@ func main() {
 	catalogApp := catalog.NewCatalogApp(logger, productsRepo, categoriesRepo)
 
 	// Set up routing
-	router := api.NewApiRouter(monitor, catalogApp)
+	corsAllowedOrigins := rest.ParseAllowedOrigins(os.Getenv("CORS_ALLOWED_ORIGINS"))
+	router := api.NewApiRouter(monitor, catalogApp, corsAllowedOrigins)
 
 	// Set up the API server
 	srv := &http.Server{

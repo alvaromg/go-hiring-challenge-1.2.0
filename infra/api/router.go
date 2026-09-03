@@ -10,7 +10,7 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
-func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App) http.Handler {
+func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App, corsAllowedOrigins []string) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /v1/catalog", productsListController(monitor, catalogApp))
@@ -18,10 +18,6 @@ func NewApiRouter(monitor shared.Monitor, catalogApp *catalog.App) http.Handler 
 	mux.HandleFunc("GET /v1/categories", categoriesListController(monitor, catalogApp))
 	mux.HandleFunc("POST /v1/categories", createCategoriesController(monitor, catalogApp))
 	mux.HandleFunc("/", rest.DefaultNotFound(monitor.Logger()))
-
-	corsAllowedOrigins := []string{
-		"http://localhost:1323",
-	}
 
 	return chainMiddlewares(mux, rest.OperationIdMiddleware, rest.NewLoggingMiddleware(monitor.Logger()), rest.NewCorsMiddleware(corsAllowedOrigins...))
 }

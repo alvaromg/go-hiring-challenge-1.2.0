@@ -1,6 +1,9 @@
 package rest
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 // NewCorsMiddleware allows browser requests from the given origins, and
 // answers CORS preflight (OPTIONS) requests directly without hitting the
@@ -29,4 +32,14 @@ func NewCorsMiddleware(allowedOrigins ...string) func(http.Handler) http.Handler
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func ParseAllowedOrigins(csv string) []string {
+	var origins []string
+	for _, o := range strings.Split(csv, ",") {
+		if o = strings.TrimSpace(o); o != "" {
+			origins = append(origins, o)
+		}
+	}
+	return origins
 }
