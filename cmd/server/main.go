@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/joho/godotenv"
@@ -15,12 +16,20 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/infra/database"
 	"github.com/mytheresa/go-hiring-challenge/infra/models"
 	"github.com/mytheresa/go-hiring-challenge/infra/monitor"
+	_ "github.com/mytheresa/go-hiring-challenge/swagger"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
+// @title Go Hiring Challenge
+// @version 1.0
+// @description This is API server for Go Hiring Challenge
+// @termsOfService http://swagger.io/terms/
+
+// @host localhost:8484
+// @BasePath /
 func main() {
 
 	// create monitor
-
 	logger, err := monitor.NewLogger("INFO", false)
 	if err != nil {
 		log.Fatalf("Error creating logger: %s", err)
@@ -31,6 +40,11 @@ func main() {
 	// Load environment variables from .env file
 	if err := godotenv.Load(".env"); err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
+	}
+
+	runDocServer, err := strconv.ParseBool(os.Getenv("RUN_DOC_SERVER"))
+	if err != nil {
+		log.Fatalf("Unable to parse START_DOC_SERVER config value: %s", err)
 	}
 
 	// signal handling for graceful shutdown
@@ -52,19 +66,19 @@ func main() {
 	productsRepo := models.NewProductsRepository(db)
 	categoriesRepo := models.NewCategoriesRepository(db)
 
-	// Initialize applications
+	// Initialize application
 	catalogApp := catalog.NewCatalogApp(productsRepo, categoriesRepo)
 
 	// Set up routing
 	router := api.NewApiRouter(monitor, catalogApp)
 
-	// Set up the HTTP server
+	// Set up the API server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("localhost:%s", os.Getenv("HTTP_PORT")),
 		Handler: router,
 	}
 
-	// Start the server
+	// Start API server
 	go func() {
 		logger.Infof("Starting server on http://%s", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -74,11 +88,44 @@ func main() {
 		logger.Infof("Server stopped gracefully")
 	}()
 
+	// Set up Swagger documentation server
+
+	docRouter := http.NewServeMux()
+	docRouter.HandleFunc("/swagger/", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:1323/swagger/doc.json"),
+	))
+	docSrv := &http.Server{
+		Addr:    fmt.Sprintf("localhost:%s", "1323"),
+		Handler: docRouter,
+	}
+
+	if runDocServer {
+		// Start DOC server (swagger)
+		go func() {
+			logger.Infof("Starting Doc server on http://%s", docSrv.Addr)
+			if err := docSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				log.Fatalf("Swagger server failed: %s", err)
+			}
+
+			logger.Infof("Doc server stopped gracefully")
+		}()
+	}
+
+	// Shutdown servers
+
 	<-ctx.Done()
-	logger.Infof("Shutting down server...")
+	logger.Infof("Shutting down API server...")
 	err = srv.Shutdown(ctx)
 	if err != nil {
-		log.Fatalf("Server shutdown failed: %s", err)
+		log.Fatalf("API server shutdown failed: %s", err)
 	}
+	if runDocServer {
+		logger.Infof("Shutting down Doc server...")
+		err = docSrv.Shutdown(ctx)
+		if err != nil {
+			log.Fatalf("Doc server shutdown failed: %s", err)
+		}
+	}
+
 	stop()
 }

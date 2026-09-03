@@ -1,0 +1,241 @@
+basePath: /
+definitions:
+  api.categoriesList:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/api.category'
+        type: array
+    type: object
+  api.category:
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+    type: object
+  api.createCategoriesRequest:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/api.category'
+        type: array
+    type: object
+  api.product:
+    properties:
+      category:
+        $ref: '#/definitions/api.category'
+      code:
+        type: string
+      price:
+        type: string
+      variants:
+        items:
+          $ref: '#/definitions/api.variant'
+        type: array
+    type: object
+  api.productsList:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/api.product'
+        type: array
+    type: object
+  api.variant:
+    properties:
+      name:
+        type: string
+      price:
+        type: string
+      sku:
+        type: string
+    type: object
+  rest.Error:
+    properties:
+      message:
+        type: string
+    type: object
+  rest.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/rest.Error'
+      metadata:
+        $ref: '#/definitions/rest.ResponseMetadata'
+    type: object
+  rest.ListResponse-api_categoriesList:
+    properties:
+      data:
+        $ref: '#/definitions/api.categoriesList'
+      metadata:
+        $ref: '#/definitions/rest.ListResponseMetadata'
+    type: object
+  rest.ListResponseMetadata:
+    properties:
+      operationId:
+        type: string
+      page:
+        type: integer
+      pageCount:
+        type: integer
+      pageSize:
+        type: integer
+      totalCount:
+        type: integer
+    type: object
+  rest.Response-api_categoriesList:
+    properties:
+      data:
+        $ref: '#/definitions/api.categoriesList'
+      metadata:
+        $ref: '#/definitions/rest.ResponseMetadata'
+    type: object
+  rest.Response-api_product:
+    properties:
+      data:
+        $ref: '#/definitions/api.product'
+      metadata:
+        $ref: '#/definitions/rest.ResponseMetadata'
+    type: object
+  rest.Response-api_productsList:
+    properties:
+      data:
+        $ref: '#/definitions/api.productsList'
+      metadata:
+        $ref: '#/definitions/rest.ResponseMetadata'
+    type: object
+  rest.ResponseMetadata:
+    properties:
+      operationId:
+        type: string
+    type: object
+host: localhost:8484
+info:
+  contact: {}
+  description: This is API server for Go Hiring Challenge
+  termsOfService: http://swagger.io/terms/
+  title: Go Hiring Challenge
+  version: "1.0"
+paths:
+  /v1/catalog:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Filter by price lower than
+        in: query
+        name: filter_price_lt
+        type: string
+      - description: Filter by category
+        in: query
+        name: filter_category_eq
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Response-api_productsList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: List products with filters and pagination
+  /v1/catalog/{code}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Product code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Response-api_product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Product detail
+  /v1/categories:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.ListResponse-api_categoriesList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: List categories with pagination
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: New categories to create
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createCategoriesRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/rest.Response-api_categoriesList'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Create multiple categoriescategories
+swagger: "2.0"

@@ -18,8 +18,7 @@ type Response[T any] struct {
 }
 
 type ResponseMetadata struct {
-	OperationId string            `json:"operationId"`
-	Websocket   map[string]string `json:"websocket,omitempty"`
+	OperationId string `json:"operationId"`
 }
 
 type EmptyResponse struct {

@@ -5,17 +5,31 @@ import (
 	"fmt"
 	"net/http"
 
-	catalogapp "github.com/mytheresa/go-hiring-challenge/app/catalog"
-	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
+	appcatalog "github.com/mytheresa/go-hiring-challenge/app/catalog"
+	domaincatalog "github.com/mytheresa/go-hiring-challenge/domain/catalog"
 	"github.com/mytheresa/go-hiring-challenge/infra/rest"
+	"github.com/mytheresa/go-hiring-challenge/shared"
 )
+
+// Create categories
+// @Summary      Create multiple categoriescategories
+// @Router       /v1/categories [post]
+// @Accept       json
+// @Produce      json
+// @param		request	body	createCategoriesRequest	true "New categories to create"
+// @Success      201  {object}  rest.Response[categoriesList]
+// @Failure      500  {object}  rest.ErrorResponse
+// @Failure      409  {object}  rest.ErrorResponse
+func createCategoriesController(monitor shared.Monitor, app *appcatalog.App) http.HandlerFunc {
+	return rest.NewHandler(monitor, app.CreateCategories, decodeCreateCategoriesFromRequest, encodeCreateCategoriesResponse, http.StatusCreated)
+}
 
 type createCategoriesRequest struct {
 	Categories []category `json:"categories"`
 }
 
-func decodeCreateCategoriesFromRequest(r *http.Request) (catalogapp.CreateCategoriesInput, error) {
-	var zero catalogapp.CreateCategoriesInput
+func decodeCreateCategoriesFromRequest(r *http.Request) (appcatalog.CreateCategoriesInput, error) {
+	var zero appcatalog.CreateCategoriesInput
 	var req createCategoriesRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -26,24 +40,24 @@ func decodeCreateCategoriesFromRequest(r *http.Request) (catalogapp.CreateCatego
 		return zero, fmt.Errorf("%w: categories list must not be empty", rest.ErrorBadRequest)
 	}
 
-	requested := make([]catalogapp.RequestedCategory, len(req.Categories))
+	requested := make([]appcatalog.RequestedCategory, len(req.Categories))
 	for i, c := range req.Categories {
 
-		code, err := catalog.ParseCategoryCode(c.Code)
+		code, err := domaincatalog.ParseCategoryCode(c.Code)
 		if err != nil {
 			return zero, err
 		}
 
-		requested[i] = catalogapp.RequestedCategory{
+		requested[i] = appcatalog.RequestedCategory{
 			Code: code,
 			Name: c.Name,
 		}
 	}
 
-	return catalogapp.CreateCategoriesInput{Categories: requested}, nil
+	return appcatalog.CreateCategoriesInput{Categories: requested}, nil
 }
 
-func encodeCreateCategoriesResponse(categories []*catalog.Category) (categoriesList, error) {
+func encodeCreateCategoriesResponse(categories []*domaincatalog.Category) (categoriesList, error) {
 	encoded := make([]category, len(categories))
 	for i, c := range categories {
 		encoded[i] = encodeCategoryResponse(c)

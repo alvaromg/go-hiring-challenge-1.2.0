@@ -1,4 +1,4 @@
 /vendor
 coverage.out
-integration.out
+integration_coverage.out
 __debug_bin*
