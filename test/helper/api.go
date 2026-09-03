@@ -94,7 +94,8 @@ func sortedSQLQueries(dir string) ([]string, error) {
 func newRouter(db *gorm.DB) http.Handler {
 	productsRepo := models.NewProductsRepository(db)
 	categoriesRepo := models.NewCategoriesRepository(db)
-	catalogApp := catalogapp.NewCatalogApp(productsRepo, categoriesRepo)
+	noopMonitor := monitor.NewNoopMonitor()
+	catalogApp := catalogapp.NewCatalogApp(noopMonitor.Logger(), productsRepo, categoriesRepo)
 
-	return api.NewApiRouter(monitor.NewNoopMonitor(), catalogApp)
+	return api.NewApiRouter(noopMonitor, catalogApp)
 }

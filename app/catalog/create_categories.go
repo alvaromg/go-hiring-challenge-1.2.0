@@ -27,5 +27,16 @@ func (app *App) CreateCategories(ctx context.Context, input CreateCategoriesInpu
 		categories[i] = c
 	}
 
-	return app.categoriesRepo.CreateCategories(ctx, categories)
+	created, err := app.categoriesRepo.CreateCategories(ctx, categories)
+	if err != nil {
+		return nil, err
+	}
+
+	codes := make([]string, len(created))
+	for i, c := range created {
+		codes[i] = c.Code().String()
+	}
+	app.logger.WithContext(ctx).WithField("codes", codes).Infof("categories created")
+
+	return created, nil
 }

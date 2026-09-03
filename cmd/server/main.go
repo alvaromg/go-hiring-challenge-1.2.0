@@ -69,7 +69,7 @@ func main() {
 	categoriesRepo := models.NewCategoriesRepository(db)
 
 	// Initialize application
-	catalogApp := catalog.NewCatalogApp(productsRepo, categoriesRepo)
+	catalogApp := catalog.NewCatalogApp(logger, productsRepo, categoriesRepo)
 
 	// Set up routing
 	router := api.NewApiRouter(monitor, catalogApp)

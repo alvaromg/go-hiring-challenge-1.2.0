@@ -9,31 +9,30 @@ import (
 
 // NewHandler creates a generic http.HandlerFunc that handle an HTTP request. The prroces is as follows:
 // 1. Execute middlewares
-// 2. Extract domain input (DI) from HTTP request. If an error occurs, return an HTTP error.
-// 3. Execute application handler, DI -> DO. If an error occurs, return an HTTP error.
-// 4. Encode domain output (DO) to REST output (RO) (dataEncoder)
+// 2. Extract application input (AI) from HTTP request. If an error occurs, return an HTTP error.
+// 3. Execute application handler, AI -> AO. If an error occurs, return an HTTP error.
+// 4. Encode application output (AO) to REST output (RO) (dataEncoder)
 // 5. Write REST output (RO) to HTTP response (wrap proper response type)
 //
 // Type parameters:
 //   - RI: REST input struct type
-//   - DI: domain input type
-//   - DO: domain output type
+//   - AI: application input type
+//   - AO: application output type
 //   - RO: REST output struct type
 //
 // Parameters:
-//   - handler: application handler function that accepts a context and an input (DI) and returns an output (DO) and an error.
-//   - requestDecoder: function that extracts domain input (DI) from HTTP request.
-//   - dataEncoder: function that encodes domain output (DO) to REST output (RO).
+//   - handler: application handler function that accepts a context and an input (AI) and returns an output (AO) and an error.
+//   - requestDecoder: function that extracts application input (AI) from HTTP request.
+//   - dataEncoder: function that encodes application output (AO) to REST output (RO).
 //   - okStatusCode: HTTP status code to be returned in case of success.
-//   - middlewares: variadic parameter of middlewares to be executed before handler.
 //
 // Developer MAY provide middlewars as variadic parameter. Middlewars will be
 // executed before handler in the same order as they are declared
-func NewHandler[DO, DI, RO any](
+func NewHandler[AO, AI, RO any](
 	monitor shared.Monitor,
-	appHandler func(context.Context, DI) (DO, error),
-	requestDecoder func(*http.Request) (DI, error),
-	dataEncoder func(DO) (RO, error),
+	appHandler func(context.Context, AI) (AO, error),
+	requestDecoder func(*http.Request) (AI, error),
+	dataEncoder func(AO) (RO, error),
 	okStatusCode int,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

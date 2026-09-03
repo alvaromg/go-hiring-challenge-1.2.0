@@ -9,6 +9,8 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/shared"
 )
 
+// NewListByQueryHandle creates a generic http.HandlerFunc that handle an HTTP request. Similar to NewHandler but in this case input is a
+// query (filters + sort + pagination) and response is a generic list response
 func NewListByQueryHandle[DO, RO, WD any](
 	monitor shared.Monitor,
 	appHandler func(context.Context, *query.Query) (list.ListResponse[DO], error),
