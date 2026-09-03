@@ -25,7 +25,6 @@ func main() {
 		os.Getenv("POSTGRES_DB"),
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_LOG_LEVEL"),
-		nil,
 	)
 	//nolint: errcheck
 	defer close()

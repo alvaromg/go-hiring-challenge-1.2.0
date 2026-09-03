@@ -37,28 +37,20 @@ func NewHandler[DO, DI, RO any](
 	okStatusCode int,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, span := startHandlerSpan(monitor, r)
-		statusCode := okStatusCode
-		var err error
-		defer func() { endHandlerSpan(span, statusCode, err) }()
-
 		decodedRequest, err := requestDecoder(r)
 		if err != nil {
-			statusCode = errToHTTPCode(err)
 			HandleHTTPError(monitor.Logger(), w, r, err)
 			return
 		}
 
-		var out DO
-		out, err = appHandler(ctx, decodedRequest)
+		out, err := appHandler(r.Context(), decodedRequest)
 		if err != nil {
-			statusCode = errToHTTPCode(err)
 			HandleHTTPError(monitor.Logger(), w, r, err)
 			return
 		}
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(okStatusCode)
-		encodeHandlerResponse(monitor.Logger(), ctx, dataEncoder, out, w, r)
+		encodeHandlerResponse(monitor.Logger(), r.Context(), dataEncoder, out, w, r)
 	}
 }
