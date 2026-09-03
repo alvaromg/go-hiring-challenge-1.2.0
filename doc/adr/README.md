@@ -15,3 +15,4 @@ This folder tracks the architecture decisions made throughout this project: the 
 - [011 - API routes with version prefix](011-api-routes-with-version-prefix.md)
 - [012 - Testing strategy](012-testing-strategy.md)
 - [013 - API doc with swaggo](013-api-doc-with-swaggo.md)
+- [014 - Database read/write split](014-database-read-write-split.md)

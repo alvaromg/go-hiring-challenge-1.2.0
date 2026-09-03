@@ -46,7 +46,16 @@ func BuildApi() (http.Handler, func()) {
 		os.Exit(1)
 	}
 
-	db, closeDB := database.New(dbUser, dbPassword, dbName, fmt.Sprintf("%d", container.DefaultPort()), "error")
+	config := database.Config{
+		Host:     "localhost",
+		Port:     fmt.Sprintf("%d", container.DefaultPort()),
+		User:     dbUser,
+		Password: dbPassword,
+		DBName:   dbName,
+	}
+
+	// The test container is a single instance, so reads and writes share the same config.
+	db, closeDB := database.New(config, config, database.PoolConfig{}, "error")
 
 	router := newRouter(db)
 

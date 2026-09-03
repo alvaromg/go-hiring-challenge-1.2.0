@@ -9,11 +9,31 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/plugin/dbresolver"
 )
 
-func New(user, password, dbname, port, logLevel string) (db *gorm.DB, close func() error) {
-	dsn := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable", user, password, port, dbname)
+// Config holds the connection parameters for a single postgres instance.
+type Config struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	DBName   string
+	SSLMode  string
+}
 
+func (c Config) dsn() string {
+	sslMode := c.SSLMode
+	if sslMode == "" {
+		sslMode = "disable"
+	}
+
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", c.User, c.Password, c.Host, c.Port, c.DBName, sslMode)
+}
+
+// New opens a database connection that routes writes to write and reads to
+// read via gorm's dbresolver plugin.
+func New(write, read Config, pool PoolConfig, logLevel string) (db *gorm.DB, close func() error) {
 	dbLogLevel, err := parseLogLevel(logLevel)
 	if err != nil {
 		log.Fatalf("failed to parse database log level: %s", err)
@@ -30,11 +50,27 @@ func New(user, password, dbname, port, logLevel string) (db *gorm.DB, close func
 		},
 	)
 
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	db, err = gorm.Open(postgres.Open(write.dsn()), &gorm.Config{
 		Logger: newLogger,
 	})
 	if err != nil {
 		log.Fatalf("failed to connect database: %s", err)
+	}
+
+	resolver := dbresolver.Register(dbresolver.Config{
+		Sources:  []gorm.Dialector{postgres.Open(write.dsn())},
+		Replicas: []gorm.Dialector{postgres.Open(read.dsn())},
+		Policy:   dbresolver.RandomPolicy{},
+	})
+	resolver.
+		SetMaxOpenConns(pool.MaxOpenConns).
+		SetMaxIdleConns(pool.MaxIdleConns).
+		SetConnMaxLifetime(pool.ConnMaxLifetime).
+		SetConnMaxIdleTime(pool.ConnMaxIdleTime)
+
+	err = db.Use(resolver)
+	if err != nil {
+		log.Fatalf("failed to register db resolver: %s", err)
 	}
 
 	sqlDB, err := db.DB()
