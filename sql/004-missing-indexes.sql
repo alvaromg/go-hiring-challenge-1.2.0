@@ -6,3 +6,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS products_code_idx ON products (code);
 -- Ensure no duplicated product variant SKUs
 
 CREATE UNIQUE INDEX IF NOT EXISTS product_variant_sku_idx ON product_variants (sku);
+
+-- Speed up filtering products by price
+
+CREATE INDEX IF NOT EXISTS products_price_idx ON products (price);
