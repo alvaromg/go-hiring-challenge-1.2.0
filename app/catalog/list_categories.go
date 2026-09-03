@@ -11,7 +11,7 @@ import (
 func (app *App) ListCategories(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Category], error) {
 	var zero list.ListResponse[*catalog.Category]
 
-	res, err := app.categoriesRepo.GetCategories(q)
+	res, err := app.categoriesRepo.GetCategories(ctx, q)
 	if err != nil {
 		return zero, err
 	}

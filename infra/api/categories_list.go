@@ -10,6 +10,7 @@ import (
 
 // CategoriesList
 // @Summary      List categories with pagination
+// @Tags         Catalog
 // @Router       /v1/categories [get]
 // @Accept       json
 // @Produce      json

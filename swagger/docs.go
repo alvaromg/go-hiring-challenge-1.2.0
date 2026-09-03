@@ -24,6 +24,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Catalog"
+                ],
                 "summary": "List products with filters and pagination",
                 "parameters": [
                     {
@@ -81,6 +84,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Catalog"
+                ],
                 "summary": "Product detail",
                 "parameters": [
                     {
@@ -127,6 +133,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Catalog"
+                ],
                 "summary": "List categories with pagination",
                 "parameters": [
                     {
@@ -169,6 +178,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Catalog"
                 ],
                 "summary": "Create multiple categoriescategories",
                 "parameters": [

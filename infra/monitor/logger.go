@@ -2,10 +2,12 @@ package monitor
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/mytheresa/go-hiring-challenge/infra/operation"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/bridges/otellogrus"
+	otellog "go.opentelemetry.io/otel/log"
 )
 
 const operationIdKey = "operationId"
@@ -14,11 +16,14 @@ type logger struct {
 	inner *logrus.Logger
 }
 
-// NewLogger creates a new logger with the specified level and formatting options.
-func NewLogger(level string, pretty bool) (*logger, error) {
+// NewLogger creates a new logger with the specified level and formatting
+// options. When loggerProvider is non-nil, every log entry is additionally
+// exported through it (e.g. to Grafana Loki via the OTLP log pipeline set up
+// by SetupOTelSDK) in parallel with the regular stdout output.
+func NewLogger(level string, pretty bool, loggerProvider otellog.LoggerProvider) (*logger, error) {
 	logLevel, err := logrus.ParseLevel(level)
 	if err != nil {
-		log.Fatalf("error parsing log level: %s", err)
+		return nil, fmt.Errorf("error parsing log level: %w", err)
 	}
 
 	l := &logger{
@@ -27,6 +32,13 @@ func NewLogger(level string, pretty bool) (*logger, error) {
 
 	l.inner.SetLevel(logLevel)
 	l.inner.SetFormatter(NewLogFormatter(pretty))
+
+	if loggerProvider != nil {
+		l.inner.AddHook(otellogrus.NewHook(
+			"go-hiring-challenge",
+			otellogrus.WithLoggerProvider(loggerProvider),
+		))
+	}
 
 	return l, nil
 }

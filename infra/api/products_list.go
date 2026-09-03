@@ -10,6 +10,7 @@ import (
 
 // ProductsList
 // @Summary      List products with filters and pagination
+// @Tags         Catalog
 // @Router       /v1/catalog [get]
 // @Accept       json
 // @Produce      json

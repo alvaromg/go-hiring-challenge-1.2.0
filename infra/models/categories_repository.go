@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/mytheresa/go-hiring-challenge/domain/catalog"
@@ -21,8 +22,10 @@ func NewCategoriesRepository(db *gorm.DB) *CategoriesRepository {
 	}
 }
 
-func (r *CategoriesRepository) GetCategories(q *query.Query) (list.ListResponse[*catalog.Category], error) {
+func (r *CategoriesRepository) GetCategories(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Category], error) {
 	var zero list.ListResponse[*catalog.Category]
+
+	db := r.db.WithContext(ctx)
 
 	// strict query validation: only pagination is allowed, no filters or sorts
 	validator := query.NewValidator()
@@ -32,7 +35,7 @@ func (r *CategoriesRepository) GetCategories(q *query.Query) (list.ListResponse[
 
 	// count all categories
 	var total int64
-	if err := r.db.Model(&category{}).Count(&total).Error; err != nil {
+	if err := db.Model(&category{}).Count(&total).Error; err != nil {
 		return zero, fmt.Errorf("%w: error counting categories: %s", libmodel.ErrorPersistence, err)
 	}
 	if total == 0 {
@@ -40,7 +43,7 @@ func (r *CategoriesRepository) GetCategories(q *query.Query) (list.ListResponse[
 	}
 
 	// apply pagination to find categories in page
-	db := libmodel.ApplyQueryPagination(r.db, q)
+	db = libmodel.ApplyQueryPagination(db, q)
 
 	var categories []category
 	if err := db.Find(&categories).Error; err != nil {
@@ -61,10 +64,10 @@ func (r *CategoriesRepository) GetCategories(q *query.Query) (list.ListResponse[
 }
 
 // CreateCategories persists all given categories in a single transaction.
-func (r *CategoriesRepository) CreateCategories(categories []*catalog.Category) ([]*catalog.Category, error) {
+func (r *CategoriesRepository) CreateCategories(ctx context.Context, categories []*catalog.Category) ([]*catalog.Category, error) {
 	dbCategories := categoriesFromDomain(categories)
 
-	err := r.db.Transaction(func(tx *gorm.DB) error {
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		return tx.Create(&dbCategories).Error
 	})
 	if err != nil {

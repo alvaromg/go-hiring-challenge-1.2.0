@@ -153,6 +153,8 @@ paths:
           schema:
             $ref: '#/definitions/rest.ErrorResponse'
       summary: List products with filters and pagination
+      tags:
+      - Catalog
   /v1/catalog/{code}:
     get:
       consumes:
@@ -183,6 +185,8 @@ paths:
           schema:
             $ref: '#/definitions/rest.ErrorResponse'
       summary: Product detail
+      tags:
+      - Catalog
   /v1/categories:
     get:
       consumes:
@@ -212,6 +216,8 @@ paths:
           schema:
             $ref: '#/definitions/rest.ErrorResponse'
       summary: List categories with pagination
+      tags:
+      - Catalog
     post:
       consumes:
       - application/json
@@ -238,4 +244,6 @@ paths:
           schema:
             $ref: '#/definitions/rest.ErrorResponse'
       summary: Create multiple categoriescategories
+      tags:
+      - Catalog
 swagger: "2.0"

@@ -13,6 +13,7 @@ import (
 
 // Create categories
 // @Summary      Create multiple categoriescategories
+// @Tags         Catalog
 // @Router       /v1/categories [post]
 // @Accept       json
 // @Produce      json

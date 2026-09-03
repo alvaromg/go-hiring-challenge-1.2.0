@@ -11,7 +11,7 @@ test ::
 	@go test -v -count=1 -race ./... -coverprofile=coverage.out -covermode=atomic
 
 test-integration ::
-	@go test -count=1 -race ./test/... -coverprofile=integration_coverage.out -covermode=atomic -coverpkg github.com/mytheresa/go-hiring-challenge...
+	@go test -v -count=1 -race ./test/... -coverprofile=integration_coverage.out -covermode=atomic -coverpkg github.com/mytheresa/go-hiring-challenge...
 	@go tool cover -html=integration_coverage.out
 
 docker-up ::

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -30,8 +31,10 @@ func NewProductsRepository(db *gorm.DB) *ProductsRepository {
 		},
 	}
 }
-func (r *ProductsRepository) GetProducts(q *query.Query) (list.ListResponse[*catalog.Product], error) {
+func (r *ProductsRepository) GetProducts(ctx context.Context, q *query.Query) (list.ListResponse[*catalog.Product], error) {
 	var zero list.ListResponse[*catalog.Product]
+
+	db := r.db.WithContext(ctx)
 
 	// strict query validation
 	validator := query.NewValidator().
@@ -49,7 +52,7 @@ func (r *ProductsRepository) GetProducts(q *query.Query) (list.ListResponse[*cat
 		}
 
 		var count int64
-		if err := r.db.Model(&category{}).Where("code = ?", categoryCode).Count(&count).Error; err != nil {
+		if err := db.Model(&category{}).Where("code = ?", categoryCode).Count(&count).Error; err != nil {
 			return zero, fmt.Errorf("%w: error checking category existence: %s", libmodel.ErrorPersistence, err)
 		}
 		if count == 0 {
@@ -58,7 +61,7 @@ func (r *ProductsRepository) GetProducts(q *query.Query) (list.ListResponse[*cat
 	}
 
 	// build query to return just products ids
-	db := r.db.Distinct("products.id")
+	db = db.Distinct("products.id")
 	if q.HasFilter(FieldCategory) {
 		db = db.Joins("JOIN categories c ON c.id = products.category_id")
 	}
@@ -88,7 +91,7 @@ func (r *ProductsRepository) GetProducts(q *query.Query) (list.ListResponse[*cat
 
 	// get full products for requested page, based on previous filtered, sortd and paginated ids
 	var products []product
-	if err := r.db.Preload("Variants").Preload("Category").Where("products.id IN ?", ids).Find(&products).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("Variants").Preload("Category").Where("products.id IN ?", ids).Find(&products).Error; err != nil {
 		return zero, fmt.Errorf("%w: error retrieving products: %s", libmodel.ErrorPersistence, err)
 	}
 
@@ -104,9 +107,9 @@ func (r *ProductsRepository) GetProducts(q *query.Query) (list.ListResponse[*cat
 	return listResp, nil
 }
 
-func (r *ProductsRepository) GetProductByCode(code catalog.ProductCode) (*catalog.Product, error) {
+func (r *ProductsRepository) GetProductByCode(ctx context.Context, code catalog.ProductCode) (*catalog.Product, error) {
 	var p product
-	err := r.db.Preload("Variants").Preload("Category").Where("code = ?", code).First(&p).Error
+	err := r.db.WithContext(ctx).Preload("Variants").Preload("Category").Where("code = ?", code).First(&p).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("%w: product %q not found", domainerrors.ErrorNotFound, code)

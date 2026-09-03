@@ -27,5 +27,5 @@ func (app *App) CreateCategories(ctx context.Context, input CreateCategoriesInpu
 		categories[i] = c
 	}
 
-	return app.categoriesRepo.CreateCategories(categories)
+	return app.categoriesRepo.CreateCategories(ctx, categories)
 }

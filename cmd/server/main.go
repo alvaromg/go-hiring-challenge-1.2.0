@@ -27,15 +27,9 @@ import (
 
 // @host localhost:8484
 // @BasePath /
+const serviceName = "go-hiring-challenge"
+
 func main() {
-
-	// create monitor
-	logger, err := monitor.NewLogger("INFO", false)
-	if err != nil {
-		log.Fatalf("Error creating logger: %s", err)
-	}
-
-	monitor := monitor.NewMonitor(logger)
 
 	// Load environment variables from .env file
 	if err := godotenv.Load(".env"); err != nil {
@@ -51,6 +45,26 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	// Bootstrap OpenTelemetry: traces and logs are exported via OTLP/HTTP to
+	// the grafana-lgtm container started by docker-compose.
+	tracer, loggerProvider, shutdownOTel, err := monitor.SetupOTelSDK(ctx, serviceName, os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
+	if err != nil {
+		log.Fatalf("Error setting up OpenTelemetry: %s", err)
+	}
+	defer func() {
+		if err := shutdownOTel(context.Background()); err != nil {
+			log.Printf("Error shutting down OpenTelemetry: %s", err)
+		}
+	}()
+
+	// create monitor
+	logger, err := monitor.NewLogger("INFO", false, loggerProvider)
+	if err != nil {
+		log.Fatalf("Error creating logger: %s", err)
+	}
+
+	monitor := monitor.NewMonitor(logger, tracer)
+
 	// Initialize database connection
 	db, close := database.New(
 		os.Getenv("POSTGRES_USER"),
@@ -58,6 +72,7 @@ func main() {
 		os.Getenv("POSTGRES_DB"),
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_LOG_LEVEL"),
+		tracer,
 	)
 	//nolint: errcheck
 	defer close()

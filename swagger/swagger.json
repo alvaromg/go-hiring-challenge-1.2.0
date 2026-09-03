@@ -18,6 +18,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Catalog"
+                ],
                 "summary": "List products with filters and pagination",
                 "parameters": [
                     {
@@ -75,6 +78,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Catalog"
+                ],
                 "summary": "Product detail",
                 "parameters": [
                     {
@@ -121,6 +127,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Catalog"
+                ],
                 "summary": "List categories with pagination",
                 "parameters": [
                     {
@@ -163,6 +172,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Catalog"
                 ],
                 "summary": "Create multiple categoriescategories",
                 "parameters": [

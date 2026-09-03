@@ -12,6 +12,7 @@ import (
 
 // ProductsList
 // @Summary      Product detail
+// @Tags         Catalog
 // @Router       /v1/catalog/{code} [get]
 // @Accept       json
 // @Produce      json

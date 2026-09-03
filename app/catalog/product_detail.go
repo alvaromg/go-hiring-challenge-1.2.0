@@ -7,5 +7,5 @@ import (
 )
 
 func (app *App) ProductDetail(ctx context.Context, code catalog.ProductCode) (*catalog.Product, error) {
-	return app.productsRepo.GetProductByCode(code)
+	return app.productsRepo.GetProductByCode(ctx, code)
 }

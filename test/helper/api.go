@@ -46,7 +46,7 @@ func BuildApi() (http.Handler, func()) {
 		os.Exit(1)
 	}
 
-	db, closeDB := database.New(dbUser, dbPassword, dbName, fmt.Sprintf("%d", container.DefaultPort()), "error")
+	db, closeDB := database.New(dbUser, dbPassword, dbName, fmt.Sprintf("%d", container.DefaultPort()), "error", nil)
 
 	router := newRouter(db)
 
